@@ -1,4 +1,4 @@
-port { CartItem } from "../models/cartItem";
+import { CartItem } from "../models/cartItem";
 import { NavigateFunction } from "react-router-dom";
 
 // === Helpers ===

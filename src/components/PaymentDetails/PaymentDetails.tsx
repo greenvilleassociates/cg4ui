@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CartService from "./../../services/cartService"; // import your CartService
 import { postBookingDetails } from "./../../services/cartService";
+import { createBooking } from "./../../services/bookingService";
 import { useNavigate } from "react-router-dom";
 
 export default function PaymentDetails() {
@@ -72,7 +73,7 @@ export default function PaymentDetails() {
       if (response.ok) {
         console.log("Payment posted successfully!");
         alert(`Transaction Successful!\nAmount: $${amount}\nTransaction ID: ${transactionId}`);
-        await createbooking(transactionId);
+        await createBooking(transactionId);
         await postBookingDetails(transactionId);
       } else {
         console.error("Payment failed.");

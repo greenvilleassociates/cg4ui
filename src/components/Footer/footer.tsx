@@ -1,9 +1,51 @@
-import './footer.css'
+import React, { useState, useEffect } from "react";
+import { BottomNavigation, BottomNavigationAction } from "@mui/material";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import SecurityIcon from "@mui/icons-material/Security";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./footer.css";
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
-    const title = "RideFinder"
-    return (
-        <div className="footer container" title='@CocyConsulting & CapGemeni Consulting'>&copy; {2025} 547Bikes All Rights Reserved.</div>
-    )
+  const [value, setValue] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/reservations")) setValue(0);
+    else if (location.pathname.startsWith("/securityadmin")) setValue(1);
+    else if (location.pathname.startsWith("/manager")) setValue(2);
+  }, [location.pathname]);
+
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+    switch (newValue) {
+      case 0:
+        navigate("/reservations");
+        break;
+      case 1:
+        navigate("/securityadmin");
+        break;
+      case 2:
+        navigate("/manager");
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <div className="footer" title="@CockyConsulting & CapGemeni Consulting">
+      <BottomNavigation value={value} onChange={handleChange} showLabels>
+        <BottomNavigationAction label="Reservations" icon={<EventNoteIcon />} />
+        <BottomNavigationAction label="Security Admin" icon={<SecurityIcon />} />
+        <BottomNavigationAction label="Manager" icon={<ManageAccountsIcon />} />
+      </BottomNavigation>
+      <div style={{ fontSize: "0.75rem", color: "#666", marginTop: "4px" }}>
+        &copy; {currentYear} 547Bikes.Info, CapGemeni Consulting, Cocky Consulting,
+        Greenville Associates Consulting, All Rights Reserved.
+      </div>
+    </div>
+  );
 }
