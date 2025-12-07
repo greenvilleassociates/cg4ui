@@ -11,7 +11,7 @@ import { useState } from 'react';
 import './Navbar.css';
 import './homebar.css';
 import LoginIcon from '@mui/icons-material/Login';
-import LogoutIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 type HomebarProps = {
   numItems: number;
@@ -53,7 +53,7 @@ export default function Homebar({ numItems }: HomebarProps) {
             cursor: 'pointer',
           }}
         >
-          [CG.UI.V4.0]
+          [CG.UI.V4.2]
         </Typography>
 
         {/* Spacer */}
@@ -64,7 +64,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           <HomeIcon />
         </Button>
         <IconButton component={Link} to="/login" color="inherit" aria-label="Login">
-  			<LoginIcon />
+ 			<LoginIcon />
 		</IconButton>
        <IconButton onClick={Link} to="/logout" color="inherit" aria-label="Logout">
           <LogoutIcon />

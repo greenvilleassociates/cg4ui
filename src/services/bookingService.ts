@@ -61,6 +61,8 @@ export const oldcreateBooking = async (transactionId: string) => {
       reservationtype: "Biking",
       reservationstatus: "Active",
       parkId: 10000,
+      resStart: "2025/12/10",
+      resEnd: "2025/12/12",
       parkName: item.park?.parkName || "SomeCGPark",
       quantityAdults: parseInt(item.numAdults) || 0,
       quantityChildren: parseInt(item.numChildren) || 0,

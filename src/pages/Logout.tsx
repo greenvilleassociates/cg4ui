@@ -31,8 +31,9 @@ function Logout() {
 
     // Set required values
     localStorage.setItem("uid", "901");
-    localStorage.setItem("status", "loggedout");
-
+    localStorage.setItem("status", "loggedout")
+    localStorage.setItem("firstname", "Ridefinder")
+    localStorage.setItem("lastname", "Guest")
     // Simulate a short delay for UX
     setTimeout(() => {
       setLoading(false);
