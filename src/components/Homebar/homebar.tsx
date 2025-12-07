@@ -53,7 +53,7 @@ export default function Homebar({ numItems }: HomebarProps) {
             cursor: 'pointer',
           }}
         >
-          [CG.UI.V4.2]
+          [CG.UI.V4.3]
         </Typography>
 
         {/* Spacer */}
@@ -66,9 +66,10 @@ export default function Homebar({ numItems }: HomebarProps) {
         <IconButton component={Link} to="/login" color="inherit" aria-label="Login">
  			<LoginIcon />
 		</IconButton>
-       <IconButton onClick={Link} to="/logout" color="inherit" aria-label="Logout">
-          <LogoutIcon />
-        </IconButton>
+  		<IconButton component={Link} to="/logout" color="inherit" aria-label="Logout">
+  			<LogoutIcon />
+		</IconButton>
+
         <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
           RideFinder
         </Button>

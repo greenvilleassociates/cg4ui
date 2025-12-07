@@ -67,6 +67,7 @@ export default function PaymentDetails() {
         await createBooking(transactionId, navigate, setLoading, setCompleted);
 
         // Clear cart
+      	await cartService.clearCart();
         localStorage.removeItem("rideFinderExampleApp");
 
         // Delay navigation so user sees spinner/message
