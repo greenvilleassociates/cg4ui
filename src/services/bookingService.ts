@@ -1,5 +1,6 @@
 import { CartItem } from "../models/cartItem";
 import { NavigateFunction } from "react-router-dom";
+import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
@@ -29,7 +30,7 @@ export const generateReservationId = (): string => {
 };
 
 
-export const createBooking = async (transactionId: string) => {
+export const oldcreateBooking = async (transactionId: string) => {
   const cartItems = getCartFromLocalStorage();
 
   if (!cartItems || !Array.isArray(cartItems)) {
@@ -56,12 +57,15 @@ export const createBooking = async (transactionId: string) => {
       creditCardLast4: "1234",
       creditCardExpDate: "12/25",
       transactionId: transactionId,
+      cartid: cartId.toString(),
+      reservationtype: "Biking",
+      reservationstatus: "Active",
+      parkId: 10000,
+      parkName: item.park?.parkName || "SomeCGPark",
       quantityAdults: parseInt(item.numAdults) || 0,
       quantityChildren: parseInt(item.numChildren) || 0,
       customerBillingName: localStorage.getItem("fullname") || "John Doe",
-      parkName: item.park?.parkName || "SomeCGPark",
-      cartid: cartId.toString(),
-      cartDetailsJson: JSON.stringify(item),
+      cartDetailsJson: JSON.stringify(item)
     };
 
     alert("trying to book!");
@@ -107,6 +111,82 @@ export const createBooking = async (transactionId: string) => {
       }
     } catch (error) {
       console.error("Error posting booking:", error);
+    }
+  }
+};
+
+export const createBooking = async (
+  transactionId: string,
+  navigate: NavigateFunction,
+  setLoading: (val: boolean) => void,
+  setCompleted: (val: boolean) => void
+) => {
+  setLoading(true);
+
+  const cartItems = getCartFromLocalStorage();
+  if (!cartItems || !Array.isArray(cartItems)) {
+    console.error("No cart items found in localStorage.");
+    alert("Fetching cart failed!");
+    setLoading(false);
+    return;
+  }
+
+  const reservationId = generateReservationId();
+
+  for (const item of cartItems) {
+    const cartId = generateCartId();
+   
+  const bookingPayload = {
+      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
+      creditCardType: "Visa",
+      creditCardLast4: "1234",
+      creditCardExpDate: "12/25",
+      reservationtype: "Biking",
+      reservationstatus: "Active",
+      transactionId: transactionId,
+      quantityAdults: parseInt(item.numAdults) || 0,
+      quantityChildren: parseInt(item.numChildren) || 0,
+      customerBillingName: localStorage.getItem("fullname") || "John Doe",
+      parkName: item.park?.parkName || "SomeCGPark",
+      cartid: cartId.toString(),
+      cartDetailsJson: JSON.stringify(item),
+    };
+
+    try {
+      const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingPayload),
+      });
+    
+      localStorage.setItem(`Booking1_${cartId}`, JSON.stringify(bookingPayload));
+
+      if (response.ok) {
+        console.log("Booking created successfully");
+        setCompleted(true);
+              // ✅ Save each booking separately under its CartId key
+        const bookingRecord = {
+          ReservationId: reservationId, // one reservation for all
+          CartId: cartId,
+          BookingInfo: bookingPayload,
+          userid: localStorage.getItem("userid") || "guest",
+          useridasstring: localStorage.getItem("userid") || "guest",
+          paymentId: transactionId,
+          };
+
+         localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
+
+        // Delay navigation so user sees spinner/message
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
+      } else {
+        console.error("Booking failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error posting booking:", error);
+    } finally {
+      setLoading(false);
     }
   }
 };
