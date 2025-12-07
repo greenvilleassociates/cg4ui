@@ -44,43 +44,44 @@ export const createBooking = async (transactionId: string) => {
   for (const item of cartItems) {
     const cartId = generateCartId();
 
-    // Handle resStart and resEnd based on numDays
-    const numDays = item.numDays || 1;
-    const resStart = new Date();
-    const resEnd = new Date(
-      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
-    );
+   const numDays = item.numDays || 1;
+const resStart = new Date();
+const resEnd = new Date(
+  resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
+);
 
-    const bookingPayload = {
-      bookingId: 0,
-      uid: localStorage.getItem("userid") || "guest",
-      billingTelephoneNumber: item.billingTelephoneNumber || "123-456-7890",
-      creditCardType: "Visa",
-      creditCardLast4: "1234",
-      creditCardExpDate: "12/25",
-      quantityAdults: item.numAdults || 0,
-      quantityChildren: item.numChildren || 0,
-      customerBillingName: item.customerBillingName || "John Doe",
-      totalAmount: item.totalAmount || 100,
-      transactionId, // ✅ same as paymentId
-      parkId: item.park?.id || "",
-      parkName: item.park?.parkName || "Unknown Park",
-      cartid: cartId,                // unique per item
-      reservationtype: "Standard",
-      reservationstatus: "Confirmed",
-      reversetransactionid: "",
-      cancellationrefund: 0,
-      cartDetailsJson: JSON.stringify(item),
-      totalcartitems: cartItems.length,
-      reference: reservationId,      // ✅ shared ReservationId
-      subReference: "",
-      adults: item.numAdults || 0,
-      children: item.numChildren || 0,
-      resStart: resStart.toISOString(),
-      resEnd: resEnd.toISOString(),
-      tentsites: item.tentsites || 0,
-    };
+const bookingPayload = {
+  bookingId: 0,
+  uid: localStorage.getItem("userid") || "guest",
+  billingTelephoneNumber: item.billingTelephoneNumber || "000-000-0000",
+  creditCardType: card.cardType || "Visa",
+  creditCardLast4: card.cardLast4 || "1234",
+  creditCardExpDate: card.cardExpDate || "12/25",
+  quantityAdults: item.numAdults || 0,
+  quantityChildren: item.numChildren || 0,
+  customerBillingName: card.fullname?.trim() || "Unknown",
+  totalAmount: parseFloat(item.totalAmount) || 100,
+  transactionId, // same as paymentId
+  parkId: item.park?.id || "",
+  parkName: item.park?.parkName || "Unknown Park",
+  cartid: cartId.toString(),
+  reservationtype: "Biking",
+  reservationstatus: "Active",
 
+  // ✅ Add both sets of fields
+  reservationStartDate: resStart.toISOString(),
+  reservationEndDate: resEnd.toISOString(),
+  resStart: resStart.toISOString(),
+  resEnd: resEnd.toISOString(),
+
+  cartDetailsJson: JSON.stringify(item),
+  totalcartitems: cartItems.length,
+  adults: item.numAdults || 0,
+  children: item.numChildren || 0,
+  tentsites: item.tentsites || 0,
+};
+    console.log("booking", bookingPayload);
+    localStorage.setItem(`Booking_${cartId}`, JSON.stringify(bookingRecord));
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
         method: "POST",
@@ -102,7 +103,7 @@ export const createBooking = async (transactionId: string) => {
           paymentId: transactionId, // ✅ same value
         };
 
-        localStorage.setItem(`Booking_${cartId}`, JSON.stringify(bookingRecord));
+       
 
         alert(`Booking Successful!\nReservation ID: ${reservationId}\nCart ID: ${cartId}`);
       } else {
