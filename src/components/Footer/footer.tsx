@@ -30,38 +30,20 @@ export default function Footer() {
       case 2:
         navigate("/manager");
         break;
-      default:
-        break;
     }
   };
 
   return (
-    <div
-      className="footer"
-      style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "100px",
-        backgroundColor: "#BF5700", // ✅ Burnt Orange
-        color: "white",
-      }}
-      title="@CockyConsulting & CapGemeni Consulting"
-    >
+    <div className="footer" title="@CockyConsulting & CapGemeni Consulting">
       <BottomNavigation
         value={value}
         onChange={handleChange}
         showLabels
         sx={{
-          backgroundColor: "#BF5700", // ✅ Burnt Orange
+          backgroundColor: "#BF5700", // burnt orange
           color: "white",
-          "& .MuiBottomNavigationAction-root": {
-            color: "white",
-          },
-          "& .Mui-selected": {
-            color: "#FFD700", // optional highlight (gold)
-          },
+          "& .MuiBottomNavigationAction-root": { color: "white" },
+          "& .Mui-selected": { color: "#FFD700" }, // gold highlight
         }}
       >
         <BottomNavigationAction label="Reservations" icon={<EventNoteIcon />} />

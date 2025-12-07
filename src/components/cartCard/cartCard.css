@@ -1,3 +1,9 @@
+.left-column 
+{
+max-height: 250px;
+}
+
+
 .card-body {
     border: 1px solid black;
     border-radius: 1em;
@@ -10,6 +16,7 @@
 .card-image {
     width: 75%;
     margin: auto;
+	height: 200px;
 }
 
 .edit-button {

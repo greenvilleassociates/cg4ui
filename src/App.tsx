@@ -16,7 +16,7 @@ import Details2 from './pages/Details2';
 import AllReviews from './pages/AllReviews';
 import Logout from './pages/Logout';
 import Manager from './pages/Manager';
-import SecurityManager from './pages/SecurityManager';
+import SecurityAdmin from './pages/SecurityAdmin';
 import Reservations from './pages/Reservations';
 
 function App() {
