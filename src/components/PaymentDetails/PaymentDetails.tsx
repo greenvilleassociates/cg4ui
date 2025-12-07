@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CartService from "./../../services/cartService"; // import your CartService
 import { postBookingDetails } from "./../../services/cartService";
+import { clearCart } from "./../../services/cartService";
 import { createBooking } from "./../../services/bookingService";
 import { useNavigate } from "react-router-dom";
 
@@ -74,7 +75,8 @@ export default function PaymentDetails() {
         console.log("Payment posted successfully!");
         alert(`Transaction Successful!\nAmount: $${amount}\nTransaction ID: ${transactionId}`);
         await createBooking(transactionId);
-        await postBookingDetails(transactionId);
+      	localStorage.removeItem("rideFinderExampleApp"); // THIS CLEARS THE CART like Cart.clearCart();
+        //await postBookingDetails(transactionId); we are going to stop at posting the reservation. Rather than deconstructing the cart.
       } else {
         console.error("Payment failed.");
       }

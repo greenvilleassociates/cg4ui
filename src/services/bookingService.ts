@@ -51,17 +51,17 @@ export const createBooking = async (transactionId: string) => {
     );
 
     const bookingPayload = {
-      UID: localStorage.getItem("uid") || "0", // ✅ match schema casing
-      CreditCardType: "Visa",
-      CreditCardLast4: "1234",
-      CreditCardExpDate: "12/25",
-      TransactionID: transactionId,
-      ParkName: item.park?.parkName || "SomeCGPark",
-      CartId: cartId.toString(),
-      // optional: include resStart/resEnd if API expects them
-      ResStart: resStart.toISOString(),
-      ResEnd: resEnd.toISOString(),
-      cartDetailsJson: item
+      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
+      creditCardType: "Visa",
+      creditCardLast4: "1234",
+      creditCardExpDate: "12/25",
+      transactionId: transactionId,
+      quantityAdults: parseInt(item.numAdults) || 0,
+      quantityChildren: parseInt(item.numChildren) || 0,
+      customerBillingName: localStorage.getItem("fullname") || "John Doe",
+      parkName: item.park?.parkName || "SomeCGPark",
+      cartid: cartId.toString(),
+      cartDetailsJson: JSON.stringify(item),
     };
 
     alert("trying to book!");
