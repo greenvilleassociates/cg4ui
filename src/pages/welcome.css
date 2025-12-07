@@ -1,0 +1,19 @@
+/* welcome.css */
+
+.sitedetails
+{
+text-align: left;
+color: peachpuff;
+font-size: 13pt;
+margin-left: 75px;
+}
+
+
+
+.ghostimage {
+  width: 400px;
+  height: 400px;
+  display: block;        /* makes the image respect margin auto */
+  margin: 0 auto;        /* centers horizontally */
+  object-fit: contain;   /* scales the image nicely inside the box */
+}
