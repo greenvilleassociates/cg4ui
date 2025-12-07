@@ -28,13 +28,13 @@ export const generateReservationId = (): string => {
   return `CG${dayOnly}${randomSixDigits}`;
 };
 
-// === Main Booking Function ===
-// transactionId = paymentId (they are the same)
+
 export const createBooking = async (transactionId: string) => {
   const cartItems = getCartFromLocalStorage();
 
   if (!cartItems || !Array.isArray(cartItems)) {
     console.error("No cart items found in localStorage.");
+    alert("Fetching cart failed!");
     return;
   }
 
@@ -44,44 +44,29 @@ export const createBooking = async (transactionId: string) => {
   for (const item of cartItems) {
     const cartId = generateCartId();
 
-   const numDays = item.numDays || 1;
-const resStart = new Date();
-const resEnd = new Date(
-  resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
-);
+    const numDays = item.numDays || 1;
+    const resStart = new Date();
+    const resEnd = new Date(
+      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
+    );
 
-const bookingPayload = {
-  bookingId: 0,
-  uid: localStorage.getItem("userid") || "guest",
-  billingTelephoneNumber: item.billingTelephoneNumber || "000-000-0000",
-  creditCardType: card.cardType || "Visa",
-  creditCardLast4: card.cardLast4 || "1234",
-  creditCardExpDate: card.cardExpDate || "12/25",
-  quantityAdults: item.numAdults || 0,
-  quantityChildren: item.numChildren || 0,
-  customerBillingName: card.fullname?.trim() || "Unknown",
-  totalAmount: parseFloat(item.totalAmount) || 100,
-  transactionId, // same as paymentId
-  parkId: item.park?.id || "",
-  parkName: item.park?.parkName || "Unknown Park",
-  cartid: cartId.toString(),
-  reservationtype: "Biking",
-  reservationstatus: "Active",
+    const bookingPayload = {
+      UID: localStorage.getItem("uid") || "0", // ✅ match schema casing
+      CreditCardType: "Visa",
+      CreditCardLast4: "1234",
+      CreditCardExpDate: "12/25",
+      TransactionID: transactionId,
+      ParkName: item.park?.parkName || "SomeCGPark",
+      CartId: cartId.toString(),
+      // optional: include resStart/resEnd if API expects them
+      ResStart: resStart.toISOString(),
+      ResEnd: resEnd.toISOString(),
+      cartDetailsJson: item
+    };
 
-  // ✅ Add both sets of fields
-  reservationStartDate: resStart.toISOString(),
-  reservationEndDate: resEnd.toISOString(),
-  resStart: resStart.toISOString(),
-  resEnd: resEnd.toISOString(),
-
-  cartDetailsJson: JSON.stringify(item),
-  totalcartitems: cartItems.length,
-  adults: item.numAdults || 0,
-  children: item.numChildren || 0,
-  tentsites: item.tentsites || 0,
-};
+    alert("trying to book!");
     console.log("booking", bookingPayload);
-    localStorage.setItem(`Booking_${cartId}`, JSON.stringify(bookingRecord));
+
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
         method: "POST",
@@ -89,28 +74,40 @@ const bookingPayload = {
         body: JSON.stringify(bookingPayload),
       });
 
+      localStorage.setItem(`Booking1_${cartId}`, JSON.stringify(bookingPayload));
+
       if (response.ok) {
-        const result = await response.json();
+        // ✅ Handle JSON or empty body safely
+        const contentType = response.headers.get("content-type");
+        let result: any;
+        if (contentType && contentType.includes("application/json")) {
+          result = await response.json();
+        } else {
+          result = await response.text(); // may be empty or plain text
+        }
+
         console.log("Booking created successfully:", result);
 
         // ✅ Save each booking separately under its CartId key
         const bookingRecord = {
-          ReservationId: reservationId, // ✅ one reservation for all
+          ReservationId: reservationId, // one reservation for all
           CartId: cartId,
           BookingInfo: bookingPayload,
           userid: localStorage.getItem("userid") || "guest",
           useridasstring: localStorage.getItem("userid") || "guest",
-          paymentId: transactionId, // ✅ same value
-        };
+          paymentId: transactionId,
+          };
 
-       
+        localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
 
         alert(`Booking Successful!\nReservation ID: ${reservationId}\nCart ID: ${cartId}`);
       } else {
-        console.error("Booking failed:", response.statusText);
+        console.error("Booking failed:", response.status, response.statusText);
+        console.error("Error body:", await response.text());
       }
     } catch (error) {
       console.error("Error posting booking:", error);
     }
   }
 };
+
