@@ -36,13 +36,39 @@ export default function Footer() {
   };
 
   return (
-    <div className="footer" title="@CockyConsulting & CapGemeni Consulting">
-      <BottomNavigation value={value} onChange={handleChange} showLabels>
+    <div
+      className="footer"
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: "100px",
+        backgroundColor: "#BF5700", // ✅ Burnt Orange
+        color: "white",
+      }}
+      title="@CockyConsulting & CapGemeni Consulting"
+    >
+      <BottomNavigation
+        value={value}
+        onChange={handleChange}
+        showLabels
+        sx={{
+          backgroundColor: "#BF5700", // ✅ Burnt Orange
+          color: "white",
+          "& .MuiBottomNavigationAction-root": {
+            color: "white",
+          },
+          "& .Mui-selected": {
+            color: "#FFD700", // optional highlight (gold)
+          },
+        }}
+      >
         <BottomNavigationAction label="Reservations" icon={<EventNoteIcon />} />
         <BottomNavigationAction label="Security Admin" icon={<SecurityIcon />} />
         <BottomNavigationAction label="Manager" icon={<ManageAccountsIcon />} />
       </BottomNavigation>
-      <div style={{ fontSize: "0.75rem", color: "#666", marginTop: "4px" }}>
+      <div style={{ fontSize: "0.75rem", marginTop: "4px" }}>
         &copy; {currentYear} 547Bikes.Info, CapGemeni Consulting, Cocky Consulting,
         Greenville Associates Consulting, All Rights Reserved.
       </div>

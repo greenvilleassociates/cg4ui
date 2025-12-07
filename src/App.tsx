@@ -15,6 +15,9 @@ import Register from './pages/Register';
 import Details2 from './pages/Details2';
 import AllReviews from './pages/AllReviews';
 import Logout from './pages/Logout';
+import Manager from './pages/Manager';
+import SecurityManager from './pages/SecurityManager';
+import Reservations from './pages/Reservations';
 
 function App() {
 
@@ -36,6 +39,9 @@ function App() {
           <Route path="/welcome" caseSensitive={false} element={<Welcome/>} />  
           <Route path="/login" caseSensitive={false} element={<Login/>} />
           <Route path="/logout" caseSensitive={false} element={<Logout/>} />
+          <Route path="/manager" caseSensitive={false} element={<Manager/>} />
+          <Route path="/securityadmin" caseSensitive={false} element={<SecurityAdmin/>} />
+          <Route path="/reservations" caseSensitive={false} element={<Reservations/>} />
           <Route path="/register" caseSensitive={false} element={<Register/>} />  
 	      <Route path="/home" caseSensitive={false} element={<Home parkService={parkService} cartService={cartService} />} />
           <Route path="/home2" caseSensitive={false} element={<Home2 />} />
