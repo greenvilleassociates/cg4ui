@@ -51,7 +51,7 @@ export default class CartService {
 }
 
 
-export async function finalizeBooking(
+export async function postBookingDetails(
   paymentID: string
 ): Promise<any> {
   const uid = localStorage.getItem("uid");
