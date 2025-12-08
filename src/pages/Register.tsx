@@ -40,6 +40,9 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Generate a random userid (6-digit number)
+    const randomUserid = Math.floor(100000 + Math.random() * 900000);
+
     // Build full payload with defaults
     const userPayload = {
       id: 0,
@@ -61,7 +64,7 @@ export default function RegisterPage() {
       fullname: `${formData.firstname} ${formData.lastname}`,
       companyid: 0,
       resettoken: null,
-      userid: 0,
+      userid: randomUserid, // ✅ random number assigned here
       btn: null,
       iscertified: 0,
       groupid1: null,
@@ -106,7 +109,7 @@ export default function RegisterPage() {
           }
         }
 
-        localStorage.setItem("userid", result?.userid || result?.id || "0");
+        localStorage.setItem("userid", result?.userid || result?.id || randomUserid.toString());
         localStorage.setItem("role", userPayload.role);
         localStorage.setItem("status", "loggedin");
 
