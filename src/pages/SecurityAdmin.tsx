@@ -7,7 +7,7 @@ const SecurityAdmin: React.FC = () => {
       const someuserid = localStorage.getItem("uidstring") || "unknown";
       const someuid = parseInt(localStorage.getItem("uid") || "0");
 
-      await fetch("https://parksapi.547bikes.info/api/Superuser", {
+      await fetch("https://parksapi.547bikes.info/api/Superuserlog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

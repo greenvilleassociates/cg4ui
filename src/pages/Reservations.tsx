@@ -8,7 +8,7 @@ const Reservations: React.FC = () => {
       const someuid = parseInt(localStorage.getItem("uid")) || 0;
       const somedescription = `Reservations accessed by: ${someuid}`;
       
-      await fetch("https://parksapi.547bikes.info/user/Action", {
+      await fetch("https://parksapi.547bikes.info/api/Useraction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
