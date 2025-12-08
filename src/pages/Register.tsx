@@ -56,7 +56,6 @@ export default function RegisterPage() {
       hashedpassword: null,
       passwordtype: null,
       jid: null,
-      profileurl: "./images/bluecircle.png",
       role: "registered",
       fullname: `${formData.firstname} ${formData.lastname}`,
       companyid: 0,
@@ -80,7 +79,6 @@ export default function RegisterPage() {
       twofactorprovidertoken: null,
       twofactorproviderauthstring: null,
       uidstring: "1",
-      activeprofileurl: "./images/bluecircle.png",
       activepictureurl: "./images/bluecircle.png",
       resettokenexpiration: null,
     };
