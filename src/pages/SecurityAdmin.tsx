@@ -5,7 +5,7 @@ const SecurityAdmin: React.FC = () => {
   const postSuperuserLog = async () => {
     try {
       const someuserid = localStorage.getItem("uidstring") || "unknown";
-      const someuid = parseInt(localStorage.getItem("uid")) || 0;
+      const someuid = parseInt(localStorage.getItem("uid") || "0");
 
       await fetch("https://parksapi.547bikes.info/api/Superuser", {
         method: "POST",
@@ -27,7 +27,7 @@ const SecurityAdmin: React.FC = () => {
   useEffect(() => {
     postSuperuserLog();
   }, []);
-const SecurityAdmin: React.FC = () => {
+
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <iframe
