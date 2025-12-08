@@ -23,6 +23,29 @@ const theme = createTheme({
   },
 });
 
+const postUserLog = async () => {
+  try {
+    const someusername = localStorage.getItem("username") || "";
+    const uid = parseInt(localStorage.getItem("uid") || "0");
+
+    await fetch("https://parksapi.547bikes.info/api/Userlog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: someusername,
+        hashid: uid,
+        hashedpassword: "", // ⚠️ optional: hash or leave blank
+        loginstatus: "new", // default
+        description: "logging in",
+        uiorigin: "react",
+      }),
+    });
+  } catch (err) {
+    console.error("Error posting user log:", err);
+  }
+};
+
+
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +76,7 @@ function Login() {
         localStorage.setItem("username", matchedUser.username || null);
         localStorage.setItem("firstname", matchedUser.firstname || null);
         localStorage.setItem("lastname", matchedUser.lastname || null);
-      
+        await postUserLog();
 
         setMessage(`Welcome, ${matchedUser.firstname} ${matchedUser.lastname}!`);
         setLoading(true);
