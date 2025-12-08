@@ -31,8 +31,6 @@ const postUserLog = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: someusername,
-        hashid: uid,
-        hashedpassword: "", // ⚠️ optional: hash or leave blank
         loginstatus: "new", // default
         description: "logging out",
         uiorigin: "react",

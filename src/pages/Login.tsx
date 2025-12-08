@@ -33,8 +33,6 @@ const postUserLog = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: someusername,
-        hashid: uid,
-        hashedpassword: "", // ⚠️ optional: hash or leave blank
         loginstatus: "new", // default
         description: "logging in",
         uiorigin: "react",
@@ -67,17 +65,17 @@ function Login() {
       );
 
       if (matchedUser) {
+        
         // Save user object to localStorage
         localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
         localStorage.setItem("status", "loggedin");
-        localStorage.setItem("uid", parseInt(matchedUser.userid) || 0);
+        localStorage.setItem("uid", matchedUser.userid || 0);
         localStorage.setItem("uidstring", matchedUser.uidstring || null);
-        localStorage.setItem("fullname", matchedUser.email || null);
+        localStorage.setItem("fullname", matchedUser.fullname || null);
         localStorage.setItem("username", matchedUser.username || null);
         localStorage.setItem("firstname", matchedUser.firstname || null);
         localStorage.setItem("lastname", matchedUser.lastname || null);
-        await postUserLog();
-
+        localStorage.setItem("email", matchedUser.email || null);
         setMessage(`Welcome, ${matchedUser.firstname} ${matchedUser.lastname}!`);
         setLoading(true);
 
@@ -85,6 +83,7 @@ function Login() {
         setTimeout(() => {
           navigate("/home");
         }, 2000);
+        await postUserLog();
       } else {
         setMessage("Invalid username or password.");
       }
