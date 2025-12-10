@@ -45,15 +45,20 @@ export default function CartDetails(props: CartDetailsProps) {
     }
 
     const getTotalPrice = () => {
-        return cart.reduce((acc, curr) => {
-            const {numAdults, numDays, numKids, park} = curr;
-            return (
-                acc + 
-                    ((numAdults * numDays * park.adultPrice) + 
-                    (numKids * numDays * park.childPrice)) * 1.08 
-        )
-        }, 0)
-    }
+  			const total = cart.reduce((acc, curr) => {
+    		const { numAdults, numDays, numKids, park } = curr;
+    		return (
+      		acc +
+      		((numAdults * numDays * park.adultPrice) +
+        	(numKids * numDays * park.childPrice)) * 1.08
+    		);
+  			}, 0);
+
+  			// ✅ Save to localStorage before returning
+  			localStorage.setItem("CartTotalPrice", total.toString());
+
+  			return total;
+			};
 	
     return(
         <div>

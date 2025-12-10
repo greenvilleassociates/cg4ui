@@ -35,7 +35,8 @@ export default function PaymentDetails() {
   const sendCardDetails = async () => {
     const transactionId = generateTransactionId();
     const last4 = cardNumber.slice(-4);
-
+	const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
+  
     const paymentPayload = {
       paymentId: 0,
       bookingId: 0,
@@ -43,7 +44,7 @@ export default function PaymentDetails() {
       cardType: "Visa",
       cardLast4: last4,
       cardExpDate: expDate,
-      amountPaid: amount,
+      amountPaid: cartTotalPrice,
       paymentDate: new Date().toISOString(),
       transactionId,
       useridasstring: localStorage.getItem("userid") || "guest",
@@ -106,7 +107,6 @@ export default function PaymentDetails() {
         <input type="text" onChange={(e) => setName(e.target.value)} value={name} />
       </div>
 
-      <button onClick={PostCart}>Post Cart</button>
       <button onClick={sendCardDetails}>Submit Payment</button>
 
       {loading && !completed && (

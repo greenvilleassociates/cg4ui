@@ -21,6 +21,84 @@ export const generateCartId = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+export const postCartToCGCart = async (transactionId: string) => {
+  const cartItems = getCartFromLocalStorage();
+
+  if (!cartItems || !Array.isArray(cartItems)) {
+    alert("No cart items found in localStorage.");
+    return;
+  }
+
+  // 🔑 Transform cart items into the schema the backend expects
+  const items = cartItems.map((item) => {
+    const numAdults = parseInt(item.numAdults) || 0;
+    const numChildren = parseInt(item.numChildren) || 0;
+    const numDays = item.numDays || 1;
+
+    const resStart = new Date();
+    const resEnd = new Date(
+      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
+    );
+
+    return {
+      park: item.park,
+      numAdults,
+      numChildren,
+      numDays,
+      resStart: resStart.toISOString(),
+      resEnd: resEnd.toISOString(),
+      totalPrice: (numAdults * (item.park?.adultPrice || 0)) +
+                  (numChildren * (item.park?.childPrice || 0)),
+    };
+  });
+
+  // ✅ Instead of recalculating, pull CartTotalPrice from localStorage
+  const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
+
+  const CGpayload = {
+    userId: parseInt(localStorage.getItem("userid") || "0"),
+    uid: localStorage.getItem("uid") || "guest",
+    transactionTotal: cartTotalPrice, // use stored CartTotalPrice
+    paymentId: transactionId,
+    items,
+  };
+  
+  console.log("CGARTPOST", JSON.stringify(CGpayload));
+  localStorage.setItem("CGCARTPOST",JSON.stringify(CGpayload));
+
+  try {
+    const response = await fetch("https://parksapi.547bikes.info/api/CGCart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(CGpayload),
+    });
+    
+    // Always read the raw text body
+    const rawText = await response.text();
+
+    if (response.ok) {
+      console.log("GC Southbound Cart posted successfully:", rawText);
+      alert(`CG Soutbound Cart posted successfully!\n\n${rawText}`);
+    } else {
+      console.error("GC Southbound Failed to post cart:", response.status, response.statusText, rawText);
+      alert(`CG Soutbound Cart Failed to post cart:\nStatus: ${response.status} ${response.statusText}\n\n${rawText}`);
+    }
+  } catch (err) {
+    console.error("GC Southbound Cart Error posting cart:", err);
+    alert(`GC Southbound Cart Error posting cart:\n${err}`);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
 // Generate ReservationId: CG + today's day + 6-digit random
 export const generateReservationId = (): string => {
   const today = new Date();
@@ -29,6 +107,120 @@ export const generateReservationId = (): string => {
   return `CG${dayOnly}${randomSixDigits}`;
 };
 
+
+	function formatDate(date) {
+  		// Pad helper
+  		const pad = (n) => (n < 10 ? "0" + n : n);
+
+  	return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes()) +
+    ":" +
+    pad(date.getSeconds())
+  	);
+	}
+
+
+
+export const createBooking = async (
+  transactionId: string,
+  navigate: NavigateFunction,
+  setLoading: (val: boolean) => void,
+  setCompleted: (val: boolean) => void
+) => {
+  setLoading(true);
+
+  const reservationId = generateReservationId();
+  const cartItems = getCartFromLocalStorage();
+
+  await postCartToCGCart(transactionId); //SEND FULL CART TO GCCART ENDPOINT AND SHOW THE RESULT IN AN ALERT MESSAGE. //!!!!IMPORTANT SEND THE FULL CART TO THE API FOR DECONSTRUCTION---->
+
+  if (!cartItems || !Array.isArray(cartItems)) {
+    console.error("No cart items found in localStorage.");
+    alert("Fetching cart failed!");
+    setLoading(false);
+    return;
+  }
+
+   for (const item of cartItems) {
+    const cartId = generateCartId();
+
+    const numDays = item.numDays || 1;
+    const resStart = new Date();
+    const resEnd = new Date(
+      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
+    );
+   
+  const bookingPayload = {
+      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
+      creditCardType: "Visa",
+      creditCardLast4: "1234",
+      creditCardExpDate: "12/25",
+      reservationtype: "Biking",
+      reservationstatus: "Active",
+      parkId: 10000,
+      parkGuid: item.id,
+      numDays: item.numDays,
+      resStart: formatDate(resStart),
+      resEnd: formatDate(resEnd),
+      transactionId: transactionId,
+      quantityAdults: parseInt(item.numAdults) || 0,
+      quantityChildren: parseInt(item.numChildren) || 0,
+      customerBillingName: localStorage.getItem("fullname") || "John Doe",
+      parkName: item.park?.parkName || "SomeCGPark",
+      cartid: cartId.toString(),
+      cartDetailsJson: JSON.stringify(item),
+    };
+
+    try {
+      const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingPayload),
+      });
+    
+      localStorage.setItem(`Booking1_${cartId}`, JSON.stringify(bookingPayload));
+
+      if (response.ok) {
+        console.log("Booking created successfully");
+        setCompleted(true);
+              // ✅ Save each booking separately under its CartId key
+        const bookingRecord = {
+          ReservationId: reservationId, // one reservation for all
+          CartId: cartId,
+          BookingInfo: bookingPayload,
+          userid: localStorage.getItem("userid") || "guest",
+          useridasstring: localStorage.getItem("userid") || "guest",
+          paymentId: transactionId,
+          };
+
+         localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
+
+        // Delay navigation so user sees spinner/message
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
+      } else {
+        console.error("Booking failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error posting booking:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+};
+
+/*
+
+//THIS IS THE OLD FORMAT NOT USED ANYMORE
 
 export const oldcreateBooking = async (transactionId: string) => {
   const cartItems = getCartFromLocalStorage();
@@ -63,8 +255,8 @@ export const oldcreateBooking = async (transactionId: string) => {
       numDays: item.numDays,
       reservationtype: "Biking",
       reservationstatus: "Active",
-      resStart: "2025-12-10T00:00:00",
-      resEnd: "2025-12-12T00:00:00",
+      resStart: formatDate(resStart), //"2025-12-10T00:00:00",resStart was failing on the backend previously due to date formatting. But the Payload should be the variable resStart
+      resEnd: 	formatDate(resEnd),					//"2025-12-12T00:00:00",     //resEnd was failing on the backed But the Payload should be the variable resEnd....
       parkName: item.park?.parkName || "SomeCGPark",
       quantityAdults: parseInt(item.numAdults) || 0,
       quantityChildren: parseInt(item.numChildren) || 0,
@@ -117,86 +309,6 @@ export const oldcreateBooking = async (transactionId: string) => {
       console.error("Error posting booking:", error);
     }
   }
-};
+};*/
 
-export const createBooking = async (
-  transactionId: string,
-  navigate: NavigateFunction,
-  setLoading: (val: boolean) => void,
-  setCompleted: (val: boolean) => void
-) => {
-  setLoading(true);
-
-  const cartItems = getCartFromLocalStorage();
-  if (!cartItems || !Array.isArray(cartItems)) {
-    console.error("No cart items found in localStorage.");
-    alert("Fetching cart failed!");
-    setLoading(false);
-    return;
-  }
-
-  const reservationId = generateReservationId();
-
-  for (const item of cartItems) {
-    const cartId = generateCartId();
-   
-  const bookingPayload = {
-      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
-      creditCardType: "Visa",
-      creditCardLast4: "1234",
-      creditCardExpDate: "12/25",
-      reservationtype: "Biking",
-      reservationstatus: "Active",
-      parkId: 10000,
-      parkGuid: item.id,
-      numDays: item.numDays,
-      resStart: "2025-12-10T00:00:00",
-      resEnd: "2025-12-12T00:00:00",
-      transactionId: transactionId,
-      quantityAdults: parseInt(item.numAdults) || 0,
-      quantityChildren: parseInt(item.numChildren) || 0,
-      customerBillingName: localStorage.getItem("fullname") || "John Doe",
-      parkName: item.park?.parkName || "SomeCGPark",
-      cartid: cartId.toString(),
-      cartDetailsJson: JSON.stringify(item),
-    };
-
-    try {
-      const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingPayload),
-      });
-    
-      localStorage.setItem(`Booking1_${cartId}`, JSON.stringify(bookingPayload));
-
-      if (response.ok) {
-        console.log("Booking created successfully");
-        setCompleted(true);
-              // ✅ Save each booking separately under its CartId key
-        const bookingRecord = {
-          ReservationId: reservationId, // one reservation for all
-          CartId: cartId,
-          BookingInfo: bookingPayload,
-          userid: localStorage.getItem("userid") || "guest",
-          useridasstring: localStorage.getItem("userid") || "guest",
-          paymentId: transactionId,
-          };
-
-         localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
-
-        // Delay navigation so user sees spinner/message
-        setTimeout(() => {
-          navigate("/home");
-        }, 2000);
-      } else {
-        console.error("Booking failed:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error posting booking:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-};
 
