@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import StarIcon from "@mui/icons-material/Star";
+import "./allreviews.css";
 
 export default function AllReviews() {
   const location = useLocation();
@@ -94,6 +95,7 @@ export default function AllReviews() {
               : review.fullname;
 
           return (
+            <div className="review-container">
             <Card key={review.id} style={{ width: 300 }}>
               <CardHeader
                 avatar={
@@ -124,7 +126,7 @@ export default function AllReviews() {
                 </Typography>
               </CardContent>
             </Card>
-          );
+          </div>);
         })}
       </div>
     </div>

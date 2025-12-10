@@ -1,0 +1,10 @@
+.review-container {
+  width: 80%;              /* or any fixed width you prefer */
+  max-width: 1200px;       /* keeps it from stretching too wide */
+  margin: 0 auto;          /* centers horizontally */
+  padding: 1rem;           /* adds some breathing room */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center; /* centers child cards inside */
+}
