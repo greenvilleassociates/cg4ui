@@ -1,3 +1,4 @@
+// AllReviews.tsx
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -11,7 +12,7 @@ import {
 } from "@mui/material";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import StarIcon from "@mui/icons-material/Star";
-import "./allreviews.css";
+import "./allreviews.css";   // import the CSS file
 
 export default function AllReviews() {
   const location = useLocation();
@@ -80,14 +81,7 @@ export default function AllReviews() {
         </Typography>
       )}
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          marginTop: "1rem",
-        }}
-      >
+      <div className="review-container">
         {reviews.map((review) => {
           const reviewerName =
             review.displayname && review.displayname.trim() !== ""
@@ -95,8 +89,7 @@ export default function AllReviews() {
               : review.fullname;
 
           return (
-            <div className="review-container">
-            <Card key={review.id} style={{ width: 300 }}>
+            <Card key={review.id} className="review-card">
               <CardHeader
                 avatar={
                   <Avatar>
@@ -126,9 +119,10 @@ export default function AllReviews() {
                 </Typography>
               </CardContent>
             </Card>
-          </div>);
+          );
         })}
       </div>
     </div>
   );
 }
+
