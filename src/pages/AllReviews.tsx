@@ -22,21 +22,13 @@ export default function AllReviews() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchReviews = async () => {
-    if (!parkId) {
-      setError("No parkId provided in URL");
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `https://parksapi.547bikes.info/api/ParkReview?parkId=${parkId}`,
-        {
-          headers: { Accept: "application/json" },
-        }
-      );
+      const response = await fetch("https://parksapi.547bikes.info/api/ParkReview", {
+        headers: { Accept: "application/json" },
+      });
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -57,14 +49,14 @@ export default function AllReviews() {
       fetchReviews();
     }, 2000);
     return () => clearTimeout(timer);
-  }, [parkId]);
+  }, []);
 
   return (
     <div style={{ padding: "1rem" }}>
       <Typography variant="h4" gutterBottom>
         Park Reviews
       </Typography>
-      <Typography variant="subtitle1">Park ID: {parkId}</Typography>
+      {parkId && <Typography variant="subtitle1">Park ID (from URL): {parkId}</Typography>}
 
       <Button
         variant="contained"
@@ -138,6 +130,3 @@ export default function AllReviews() {
     </div>
   );
 }
-
-
-
