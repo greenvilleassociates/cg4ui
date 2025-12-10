@@ -37,20 +37,20 @@ export default function Home(props: HomeProps) {
         const randomChance = Math.random()
         return randomChance > .2 ? true : false;
     }
-
+/* JSS TEMPORARY CODE TO ALLOW FOR DEVELOPMENT
     const getAverageRating = (reviews: Review[] | null | undefined) => {
     if (!reviews || reviews.length === 0) {
         return 0; // default rating if no reviews
     }
     return reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length;
 	};
-
+*/
        
     //AVERAGE RATING ABENDS IF PARK REVIEWS ARE NULL BAD CODE...
-    /*const getAverageRating = (reviews: Review[]) => {
+    const getAverageRating = (reviews: Review[]) => {
         return (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length) 
         //<FeaturedParks allParks={parks.filter((park) => isNear(park.location, searchParams.location) && getAverageRating(park.reviews) > searchParams.rating)} />
-    }*/
+    }
 
     const searchFn = (params: searchParams) => {
         setSearchParams(params);
