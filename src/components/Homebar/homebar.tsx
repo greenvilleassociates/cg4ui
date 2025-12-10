@@ -53,7 +53,7 @@ export default function Homebar({ numItems }: HomebarProps) {
             cursor: 'pointer',
           }}
         >
-          [CG.UI.V7.02]
+          [CG.UI.V7.03]
         </Typography>
 
         {/* Spacer */}

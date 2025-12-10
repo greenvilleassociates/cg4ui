@@ -4,6 +4,7 @@ import ParkService from "../services/parkService";
 import IPark from "../models/park";
 import "./parkcard.css"; // new CSS file for card styling
 import { Button } from "@mui/material"; // Material UI button
+import { Link } from 'react-router-dom';
 
 const parkService = new ParkService();
 
@@ -46,14 +47,13 @@ export default function Home2() {
                   Adult: ${park.adultPrice} | Child: ${park.childPrice}
                 </p>
                 {/* Book Now button */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleBookNow(park.id)}
-                  sx={{ mt: 2 }}
-                >
-                  Book Now
-                </Button>
+                <Link to={`/details/${park.id}`}>
+  				          <button className="button-primary button-book">Book Now</button>
+			          </Link>
+                 <Link to={`/details2?parkid=${park.id}`}>
+                          <button className="button2-primary button2-book">Park Reviews</button>
+                </Link>
+                                    
               </div>
             </div>
           ))
