@@ -1,36 +1,35 @@
-/* reviews.css */
-
 .review-container {
-  max-width: 1400px;
-  margin: 0 auto;                /* center the whole block */
+  width: 100%;
+  max-width: 1600px;                           /* plenty of room */
+  margin: 0 auto;                              /* center horizontally */
   padding: 1rem;
 
   display: grid;
-  grid-template-columns: repeat(5, 1fr);  /* exactly 5 cards per row */
+  grid-template-columns: repeat(5, minmax(220px, 1fr));  /* enforce 5 columns */
   gap: 16px;
   align-items: start;
-  justify-items: center;         /* center each card in its grid cell */
+  justify-items: stretch;                      /* cards fill the cell */
 }
 
+/* Ensure the card fills its grid cell */
 .review-card {
   width: 100%;
-  max-width: 260px;              /* keeps cards from stretching too wide */
 }
 
-/* Responsive breakpoints */
+/* Responsive fallbacks */
 @media (max-width: 1200px) {
   .review-container {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
   }
 }
 @media (max-width: 992px) {
   .review-container {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
   }
 }
 @media (max-width: 768px) {
   .review-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 }
 @media (max-width: 480px) {
