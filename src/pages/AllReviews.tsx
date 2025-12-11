@@ -108,8 +108,8 @@ export default function AllReviews() {
                 <Typography variant="body1" gutterBottom>
                   {review.description}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Park Name: {review.name}
+              <Typography variant="body2" color="textSecondary">
+                  Park Name: {review.parkName}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Park ID: {review.parkId}

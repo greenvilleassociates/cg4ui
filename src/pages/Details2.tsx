@@ -52,6 +52,9 @@ const Details2 = () => {
       const revRes = await fetch(
         `https://parksapi.547bikes.info/api/ParkReview/parkid/${parkId}`
       );
+    
+      const somepark = revRes.name;
+      localStorage.setItem("temppark",somepark);
       if (revRes.ok) {
         const revData = await revRes.json();
         setReviews(revData);
@@ -74,9 +77,11 @@ const Details2 = () => {
       dateDenied: null,
       reasonDescription: null,
       reviewManagerId: null,
-      parkName: parkName,
+      parkName: parkName || "Generic Park",
+      displayname: localStorage.getItem("fullname") || "Some Displayname",
+      fullname: localStorage.getItem("fullname") || "Some Name",
     };
-
+      //POSOURCE: "CAPGEMENI_UI"
     const response = await fetch("https://parksapi.547bikes.info/api/ParkReview", {
       method: "POST",
       headers: {

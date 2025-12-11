@@ -62,7 +62,7 @@ export default function PaymentDetails() {
 
       if (response.ok) {
         console.log("Payment posted successfully!");
-        alert(`Transaction Successful!\nAmount: $${amount}\nTransaction ID: ${transactionId}`);
+        alert(`Transaction Successful!\nTransaction ID: ${transactionId}/${cartTotalPrice}`);
 
         // Call booking service
         await createBooking(transactionId, navigate, setLoading, setCompleted);
