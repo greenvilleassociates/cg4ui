@@ -4,6 +4,27 @@ import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
+async function updateParkInventory(parkId: number, addSomeGuests: number) {
+  try {
+    const response = await fetch(
+      `https://parksapi.547bikes.info/api/ParkInventory/addguests?park=${parkId}&Addsomeguests=${addSomeGuests}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (response.ok) {
+      console.log("Park inventory updated successfully");
+    } else {
+      console.error("Failed to update park inventory:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error updating park inventory:", error);
+  }
+}
+
+
 // Safely get cart array from localStorage
 export const getCartFromLocalStorage = (): any[] | null => {
   try {
@@ -79,13 +100,16 @@ export const postCartToCGCart = async (transactionId: string) => {
     if (response.ok) {
       console.log("GC Southbound Cart posted successfully:", rawText);
       alert(`CG Soutbound Cart posted successfully!\n\n${rawText}`);
+      return 1;
     } else {
       console.error("GC Southbound Failed to post cart:", response.status, response.statusText, rawText);
       alert(`CG Soutbound Cart Failed to post cart:\nStatus: ${response.status} ${response.statusText}\n\n${rawText}`);
+      return 0;
     }
   } catch (err) {
     console.error("GC Southbound Cart Error posting cart:", err);
     alert(`GC Southbound Cart Error posting cart:\n${err}`);
+    return 0;
   }
 };
 
@@ -140,11 +164,14 @@ export const createBooking = async (
   const reservationId = generateReservationId();
   const cartItems = getCartFromLocalStorage();
 
-  await postCartToCGCart(transactionId); //SEND FULL CART TO GCCART ENDPOINT AND SHOW THE RESULT IN AN ALERT MESSAGE. //!!!!IMPORTANT SEND THE FULL CART TO THE API FOR DECONSTRUCTION---->
-
-  if (!cartItems || !Array.isArray(cartItems)) {
+  const someresponse = await postCartToCGCart(transactionId); //SEND FULL CART TO GCCART ENDPOINT AND SHOW THE RESULT IN AN ALERT MESSAGE. //!!!!IMPORTANT SEND THE FULL CART TO THE API FOR DECONSTRUCTION---->
+  
+  
+  if (!cartItems || !Array.isArray(cartItems) || !someresponse)  //ADDED A CHECK TO SEE IF THE GC POSTS.... IF IT FAILS THEN YOU SHOULDNT POST A BOOKING RECORD... BUT NOTE BOOKING COULD BE DONE IN BACKOFFICE.
+  																 //A FAILED POST TO THE BACKOFFICE SHOULD NOT CLEAR THE CART... AS YOU SHOULD BE ABLE TO TRY AGAIN.
+  {
     console.error("No cart items found in localStorage.");
-    alert("Fetching cart failed!");
+    alert("Fetching cart failed!. Booking Terminated");
     setLoading(false);
     return;
   }
@@ -157,7 +184,7 @@ export const createBooking = async (
     const resEnd = new Date(
       resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
     );
-   
+  /* OLD PAYLOAD BUT WORKING
   const bookingPayload = {
       uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
       creditCardType: "Visa",
@@ -176,8 +203,45 @@ export const createBooking = async (
       customerBillingName: localStorage.getItem("fullname") || "John Doe",
       parkName: item.park?.parkName || "SomeCGPark",
       cartid: cartId.toString(),
+  	  possource: "CAPGEMENI_UI_RIDEFINDER",
       cartDetailsJson: JSON.stringify(item),
-    };
+    };*/
+   
+
+  const bookingPayload = {
+  bookingId: 0,
+  uid: localStorage.getItem("uid") || "guest",
+  billingTelephoneNumber: localStorage.getItem("billingPhone") || "000-000-0000",
+  creditCardType: localStorage.getItem("cardType") || "Visa",
+  creditCardLast4: localStorage.getItem("last4") || "1234",
+  creditCardExpDate: localStorage.getItem("expDate") || "12/25",
+  quantityAdults: parseInt(item.numAdults) || 0,
+  quantityChildren: parseInt(item.numChildren) || 0,
+  customerBillingName: localStorage.getItem("cardholdername") || "John Doe",
+  totalAmount: parseFloat(localStorage.getItem("CartTotalPrice") || "0"),
+  transactionId,
+  parkId: parseInt(localStorage.getItem("uid")) || 0,
+  parkName: item.park?.parkName || "Unknown Park",
+  cartid: cartId.toString(),
+  reservationtype: "Biking",
+  reservationstatus: "Active",
+  reversetransactionid: "",
+  cancellationrefund: 0,
+  cartDetailsJson: JSON.stringify(item),
+  totalcartitems: cartItems.length,
+  reference: generateReservationId(),
+  subReference: cartId.toString(),
+  adults: parseInt(item.numAdults) || 0,
+  children: parseInt(item.numChildren) || 0,
+  resStart: item.resStart,
+  resEnd: item.resEnd,
+  tentsites: item.tentsites || 0,
+  parkGuid: item.park?.id || "",
+  numDays: item.numDays || 1,
+  possource: "CAPGEMNI_RIDEFINDER",   // ? corrected
+};
+   
+   
 
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
@@ -202,7 +266,9 @@ export const createBooking = async (
           };
 
          localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
-
+  		// ? Update park inventory with total guests
+  		const totalGuests = bookingPayload.quantityAdults + bookingPayload.quantityChildren;
+  		await updateParkInventory(bookingPayload.parkId, totalGuests);
         // Delay navigation so user sees spinner/message
         setTimeout(() => {
           navigate("/home");

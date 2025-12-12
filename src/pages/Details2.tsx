@@ -13,6 +13,7 @@ const Details2 = () => {
   const [stars, setStars] = useState(0);
   const [parkName, setParkName] = useState("");
   const [parkIndex, setParkIndex] = useState("");
+  const [parkGUID, setParkGUID] = useState("");
   const [parkDetails, setParkDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -28,6 +29,7 @@ const Details2 = () => {
             setParkName(match.name);
             setParkIndex(match.parkId);
             setParkDetails(match);
+            setParkGUID(match.id);
 
             localStorage.setItem("SomeParkIndex", match.parkId || null);
             localStorage.setItem("SomeParkName", match.name || null);
@@ -80,6 +82,8 @@ const Details2 = () => {
       parkName: parkName || "Generic Park",
       displayname: localStorage.getItem("fullname") || "Some Displayname",
       fullname: localStorage.getItem("fullname") || "Some Name",
+      possource: "CAPGEMENI_UI",
+      parkGuid: parkGUID
     };
       //POSOURCE: "CAPGEMENI_UI"
     const response = await fetch("https://parksapi.547bikes.info/api/ParkReview", {

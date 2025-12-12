@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function PaymentDetails() {
   const [cardNumber, setCardNumber] = useState("");
   const [expDate, setExpDate] = useState("");
+  const [cardType, setCardType] = useState("");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState(100); // Example amount, replace with real cart total
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,37 @@ export default function PaymentDetails() {
     const last4 = cardNumber.slice(-4);
 	const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
   
+  
+      localStorage.setItem("last4", last4);
+  	  localStorage.setItem("expDate", expDate);
+      localStorage.setItem("cardholdername", name);
+      localStorage.setItem("cardType", cardType);
+     
+   
+  
+    const paymentPayload = {
+    paymentId: 0,
+    bookingId: 0, // replace with actual bookingId after Booking POST
+    paymentMethod: "CreditCard",
+    cardType: cardType || "Visa",
+    cardLast4: last4,
+    cardExpDate: expDate,
+    amountPaid: cartTotalPrice,
+    paymentDate: new Date().toISOString(),
+    transactionId,
+    useridasstring: localStorage.getItem("uid") || "1",
+    transtype: "Sale",
+    refundTransactionId: "",
+    amountRefunded: 0,
+    fullname: localStorage.getItem("fullname") || "Unknown Cardholder",
+    userid: parseInt(localStorage.getItem("uid")) || 1,
+    possource: "CAPGEMNI_RIDEFINDER" 
+  };
+  
+   console.log("paymentPayload", paymentPayload);
+  
+  
+  /* WORKING PAYMENT PAYLOAD BUT WITH INCOMPLETE DATA
     const paymentPayload = {
       paymentId: 0,
       bookingId: 0,
@@ -51,7 +83,9 @@ export default function PaymentDetails() {
       transtype: "Sale",
       refundTransactionId: "",
       amountRefunded: 0,
-    };
+    };*/
+  
+
 
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Payments", {
@@ -80,6 +114,7 @@ export default function PaymentDetails() {
         setCardNumber("");
         setExpDate("");
         setName("");
+        setCardType("");
       } else {
         console.error("Payment failed.");
       }
@@ -99,6 +134,10 @@ export default function PaymentDetails() {
         />
       </div>
       <div>
+        <label>Card Type</label>
+        <input type="text" onChange={(e) => setCardType(e.target.value)} value={cardType} />
+      </div>
+  	  <div>
         <label>Expiration Date</label>
         <input type="text" onChange={(e) => setExpDate(e.target.value)} value={expDate} />
       </div>
