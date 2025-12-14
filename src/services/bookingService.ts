@@ -4,31 +4,64 @@ import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
-  async function updateParkInventoryByGuid(parkGuid, addSomeGuests) {
-    // ? Build the URL string first
-    const url = `https://parksapi.547bikes.info/api/ParkInventory/addguestsguid?park=${parkGuid}&Addsomeguests=${addSomeGuests}`;
-    
-    // ? Log it for debugging
-    console.log("Update Park Inventory URL:", url);
+ async function updateParkInventoryAndCalendar(parkGuid,addSomeGuests)
+  {
+  try {
+    // ? Build inventory URL
+    const inventoryUrl = `https://parksapi.547bikes.info/api/ParkInventory/addguestsguid?park=${parkGuid}&Addsomeguests=${addSomeGuests}`;
+    console.log("Update Park Inventory URL:", inventoryUrl);
 
-    // ? Use the variable in fetch
-    const response = await fetch(url, {
+    // ? Update inventory
+    const inventoryResponse = await fetch(inventoryUrl, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
     });
-  
-      if (response.ok) {
-        console.log("Park inventory updated successfully");
-        return true;
-      } else {
-        console.error("Failed to update park inventory:", response.statusText);
-        return false;
-      }
-    } catch (error) {
-      console.error("Error updating park inventory:", error);
+
+    if (!inventoryResponse.ok) {
+      console.error("Failed to update park inventory:", inventoryResponse.statusText);
       return false;
     }
+    console.log("Park inventory updated successfully");
+
+    // ? Build calendar payload
+    const now = new Date().toISOString();
+    const calendarPayload = [
+      {
+        id: 0,
+      	parkId: "fixparkidafterpost",            // always -100
+        customerId: 33,  // from localStorage or booking flow
+        startDate: "2025-12-14T01:15:46.125Z",
+        endDate: "2025-12-25T01:15:46.125Z",            // adjust if you have actual booking duration
+        transactionId: "sometransactionId" || "",
+        bookId: "somebookingId" || "",
+        qtyAdults: 2,
+        qtyChildren: addSomeGuests-2,
+      	parkGuid: parkGuid 
+      },
+    ];
+
+    console.log("Posting ParkCalendar payload:", calendarPayload);
+
+    // ? Post to ParkCalendar
+    const calendarResponse = await fetch("https://parksapi.547bikes.info/api/ParkCalendar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(calendarPayload),
+    });
+
+    if (calendarResponse.ok) {
+      console.log("Park calendar updated successfully");
+      return true;
+    } else {
+      console.error("Failed to update park calendar:", calendarResponse.statusText);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating park inventory and calendar:", error);
+    return false;
   }
+}
+
 
 
 // Safely get cart array from localStorage
@@ -274,7 +307,7 @@ export const createBooking = async (
          localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
   		// ? Update park inventory with total guests
   		const totalGuests = bookingPayload.quantityAdults + bookingPayload.quantityChildren;
-  		await updateParkInventory(bookingPayload.parkGuid, totalGuests);
+  		await updateParkInventoryAndCalendar(bookingPayload.parkGuid, totalGuests);
         // Delay navigation so user sees spinner/message
         setTimeout(() => {
           navigate("/home");
