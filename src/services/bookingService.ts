@@ -4,25 +4,31 @@ import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
-async function updateParkInventory(parkId, addSomeGuests) {
-  try {
-    const response = await fetch(
-      `https://parksapi.547bikes.info/api/ParkInventory/addguests?park=${parkId}&Addsomeguests=${addSomeGuests}`,
-      {
-        method: "PUT", // or "POST" if the API requires
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+  async function updateParkInventoryByGuid(parkGuid, addSomeGuests) {
+    // ? Build the URL string first
+    const url = `https://parksapi.547bikes.info/api/ParkInventory/addguestsguid?park=${parkGuid}&Addsomeguests=${addSomeGuests}`;
+    
+    // ? Log it for debugging
+    console.log("Update Park Inventory URL:", url);
 
-    if (response.ok) {
-      console.log("Park inventory updated successfully");
-    } else {
-      console.error("Failed to update park inventory:", response.statusText);
+    // ? Use the variable in fetch
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+    });
+  
+      if (response.ok) {
+        console.log("Park inventory updated successfully");
+        return true;
+      } else {
+        console.error("Failed to update park inventory:", response.statusText);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating park inventory:", error);
+      return false;
     }
-  } catch (error) {
-    console.error("Error updating park inventory:", error);
   }
-}
 
 
 // Safely get cart array from localStorage
@@ -268,7 +274,7 @@ export const createBooking = async (
          localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
   		// ? Update park inventory with total guests
   		const totalGuests = bookingPayload.quantityAdults + bookingPayload.quantityChildren;
-  		await updateParkInventory(bookingPayload.parkId, totalGuests);
+  		await updateParkInventory(bookingPayload.parkGuid, totalGuests);
         // Delay navigation so user sees spinner/message
         setTimeout(() => {
           navigate("/home");
