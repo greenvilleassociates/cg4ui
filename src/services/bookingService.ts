@@ -4,12 +4,12 @@ import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
-async function updateParkInventory(parkId: number, addSomeGuests: number) {
+async function updateParkInventory(parkId, addSomeGuests) {
   try {
     const response = await fetch(
       `https://parksapi.547bikes.info/api/ParkInventory/addguests?park=${parkId}&Addsomeguests=${addSomeGuests}`,
       {
-        method: "PUT",
+        method: "PUT", // or "POST" if the API requires
         headers: { "Content-Type": "application/json" },
       }
     );
