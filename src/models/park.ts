@@ -12,4 +12,7 @@ export default interface IPark {
     imageUrl?: string;
     adultPrice: number;
     childPrice: number;
+    parkId: number;
+    someLat: number;
+    someLong: number;
 }

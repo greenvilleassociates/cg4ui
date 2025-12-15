@@ -25,20 +25,19 @@ import { Dispatch, SetStateAction } from "react";
 
     // ? Build calendar payload
     const now = new Date().toISOString();
-    const calendarPayload = [
+    const calendarPayload = 
       {
-        id: 0,
-      	parkId: "fixparkidafterpost",            // always -100
-        customerId: 33,  // from localStorage or booking flow
-        startDate: "2025-12-14T01:15:46.125Z",
-        endDate: "2025-12-25T01:15:46.125Z",            // adjust if you have actual booking duration
-        transactionId: "sometransactionId" || "",
-        bookId: "somebookingId" || "",
+      	parkId: "fixparkidafterpost",        
+        customerId: 33,  
+        startDate: now,
+        endDate: now,            
+        transactionId: "sometransactionId",
+        bookId: "somebookingId",
         qtyAdults: 2,
-        qtyChildren: addSomeGuests-2,
+        qtyChildren: 2,
       	parkGuid: parkGuid 
-      },
-    ];
+      };
+    
 
     console.log("Posting ParkCalendar payload:", calendarPayload);
 

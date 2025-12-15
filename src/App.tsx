@@ -18,6 +18,7 @@ import Logout from './pages/Logout';
 import Manager from './pages/Manager';
 import SecurityAdmin from './pages/SecurityAdmin';
 import Reservations from './pages/Reservations';
+import AuthLogin from './pages/AuthLogin';
 
 function App() {
   const parkService = new ParkService();
@@ -54,6 +55,7 @@ function App() {
         <Route path="/securityadmin" caseSensitive={false} element={<SecurityAdmin />} />
         <Route path="/reservations" caseSensitive={false} element={<Reservations />} />
         <Route path="/register" caseSensitive={false} element={<Register />} />  
+        <Route path="/auth" caseSensitive={false} element={<AuthLogin />} />  
         <Route
           path="/home"
           caseSensitive={false}

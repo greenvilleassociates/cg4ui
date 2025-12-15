@@ -53,7 +53,7 @@ export default function Homebar({ numItems }: HomebarProps) {
             cursor: 'pointer',
           }}
         >
-          [CG.UI.V11.5.121325.7.21.G.FINAL]
+          [CG.UI.V12.5.121525.10.00.G.OTHER]
         </Typography>
 
         {/* Spacer */}
@@ -107,6 +107,9 @@ export default function Homebar({ numItems }: HomebarProps) {
           </MenuItem>
           <MenuItem component={Link} to="/register" onClick={handleMenuClose}>
             Signup
+          </MenuItem>
+           <MenuItem component={Link} to="/auth" onClick={handleMenuClose}>
+            Auth Login
           </MenuItem>
           <MenuItem onClick={() => { toggleTheme(); handleMenuClose(); }}>
             {darkTheme ? (

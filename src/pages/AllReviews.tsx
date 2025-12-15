@@ -1,6 +1,5 @@
-// AllReviews.tsx
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";   // <-- add useNavigate
 import {
   Card,
   CardHeader,
@@ -12,10 +11,11 @@ import {
 } from "@mui/material";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import StarIcon from "@mui/icons-material/Star";
-import "./allreviews.css";   // import the CSS file
+import "./allreviews.css";
 
 export default function AllReviews() {
   const location = useLocation();
+  const navigate = useNavigate();   // <-- hook for routing
   const queryParams = new URLSearchParams(location.search);
   const parkId = queryParams.get("parkid");
 
@@ -45,7 +45,6 @@ export default function AllReviews() {
     }
   };
 
-  // Auto‑load after 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchReviews();
@@ -108,7 +107,7 @@ export default function AllReviews() {
                 <Typography variant="body1" gutterBottom>
                   {review.description}
                 </Typography>
-              <Typography variant="body2" color="textSecondary">
+                <Typography variant="body2" color="textSecondary">
                   Park Name: {review.parkName}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
@@ -117,6 +116,16 @@ export default function AllReviews() {
                 <Typography variant="caption" color="textSecondary">
                   Posted: {review.datePosted}
                 </Typography>
+
+                {/* NEW BUTTON TO ROUTE TO DETAILS */}
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  style={{ marginTop: "0.5rem" }}
+                  onClick={() => navigate(`/details/${review.parkGuid}`)}
+                >
+                  View Details
+                </Button>
               </CardContent>
             </Card>
           );
@@ -125,4 +134,5 @@ export default function AllReviews() {
     </div>
   );
 }
+
 

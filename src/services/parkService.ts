@@ -74,6 +74,9 @@ const mockData: IPark[] = [
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
         adultPrice: 25,
         childPrice: 15,
+	someLat: 0.0,
+	someLong: 0.0,
+	parkId: 1001,
         imageUrl: "https://placehold.co/600x400/334155/FFF?text=Motobike+Mayhem",
         reviews: [
             {
@@ -133,6 +136,9 @@ const mockData: IPark[] = [
         description: "This park boasts extreme hills and fun drops for all thrill-seekers.",
         adultPrice: 25,
         childPrice: 15,
+	someLat: 0.0,
+	someLong: 0.0,
+	parkId: 1002,
         imageUrl: "https://placehold.co/600x400/3321a5/FFF?text=Crossbar+Parkway",
         reviews: [
             {
