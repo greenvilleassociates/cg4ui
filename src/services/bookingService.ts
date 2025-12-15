@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 
 // === Helpers ===
 
- async function updateParkInventoryAndCalendar(parkGuid,addSomeGuests)
+ async function updateParkInventoryAndCalendar(parkGuid,addSomeGuests, numChildren, numAdults, parkId, sometransactionId, somebookingId, someresstart, someresend)
   {
   try {
     // ? Build inventory URL
@@ -27,14 +27,14 @@ import { Dispatch, SetStateAction } from "react";
     const now = new Date().toISOString();
     const calendarPayload = 
       {
-      	parkId: "fixparkidafterpost",        
+      	parkId: parkId.toString(),        
         customerId: 33,  
-        startDate: now,
-        endDate: now,            
-        transactionId: "sometransactionId",
-        bookId: "somebookingId",
-        qtyAdults: 2,
-        qtyChildren: 2,
+        startDate: someresstart.toISOString() || now,
+        endDate: someresend.toISOString() || now,            
+        transactionId: sometransactionId,
+        bookId: somebookingId,
+        qtyAdults: numAdults,
+        qtyChildren: numChildren,
       	parkGuid: parkGuid 
       };
     
@@ -91,7 +91,7 @@ export const postCartToCGCart = async (transactionId: string) => {
   // 🔑 Transform cart items into the schema the backend expects
   const items = cartItems.map((item) => {
     const numAdults = parseInt(item.numAdults) || 0;
-    const numChildren = parseInt(item.numChildren) || 0;
+    const numChildren = parseInt(item.numKids) || 0;
     const numDays = item.numDays || 1;
 
     const resStart = new Date();
@@ -152,16 +152,6 @@ export const postCartToCGCart = async (transactionId: string) => {
 };
 
 
-
-
-
-
-
-
-
-
-
-// Generate ReservationId: CG + today's day + 6-digit random
 export const generateReservationId = (): string => {
   const today = new Date();
   const dayOnly = today.getDate().toString().padStart(2, "0");
@@ -170,8 +160,7 @@ export const generateReservationId = (): string => {
 };
 
 
-	function formatDate(date) {
-  		// Pad helper
+function formatDate(date) {
   		const pad = (n) => (n < 10 ? "0" + n : n);
 
   	return (
@@ -206,7 +195,7 @@ export const createBooking = async (
   
   
   if (!cartItems || !Array.isArray(cartItems) || !someresponse)  //ADDED A CHECK TO SEE IF THE GC POSTS.... IF IT FAILS THEN YOU SHOULDNT POST A BOOKING RECORD... BUT NOTE BOOKING COULD BE DONE IN BACKOFFICE.
-  																 //A FAILED POST TO THE BACKOFFICE SHOULD NOT CLEAR THE CART... AS YOU SHOULD BE ABLE TO TRY AGAIN.
+ //A FAILED POST TO THE BACKOFFICE SHOULD NOT CLEAR THE CART... AS YOU SHOULD BE ABLE TO TRY AGAIN.
   {
     console.error("No cart items found in localStorage.");
     alert("Fetching cart failed!. Booking Terminated");
@@ -222,30 +211,7 @@ export const createBooking = async (
     const resEnd = new Date(
       resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
     );
-  /* OLD PAYLOAD BUT WORKING
-  const bookingPayload = {
-      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
-      creditCardType: "Visa",
-      creditCardLast4: "1234",
-      creditCardExpDate: "12/25",
-      reservationtype: "Biking",
-      reservationstatus: "Active",
-      parkId: 10000,
-      parkGuid: item.id,
-      numDays: item.numDays,
-      resStart: formatDate(resStart),
-      resEnd: formatDate(resEnd),
-      transactionId: transactionId,
-      quantityAdults: parseInt(item.numAdults) || 0,
-      quantityChildren: parseInt(item.numChildren) || 0,
-      customerBillingName: localStorage.getItem("fullname") || "John Doe",
-      parkName: item.park?.parkName || "SomeCGPark",
-      cartid: cartId.toString(),
-  	  possource: "CAPGEMENI_UI_RIDEFINDER",
-      cartDetailsJson: JSON.stringify(item),
-    };*/
    
-
   const bookingPayload = {
   bookingId: 0,
   uid: localStorage.getItem("uid") || "guest",
@@ -258,7 +224,7 @@ export const createBooking = async (
   customerBillingName: localStorage.getItem("cardholdername") || "John Doe",
   totalAmount: parseFloat(localStorage.getItem("CartTotalPrice") || "0"),
   transactionId,
-  parkId: parseInt(localStorage.getItem("uid")) || 0,
+  parkId: item.park?.parkId || 0,
   parkName: item.park?.parkName || "Unknown Park",
   cartid: cartId.toString(),
   reservationtype: "Biking",
@@ -267,10 +233,10 @@ export const createBooking = async (
   cancellationrefund: 0,
   cartDetailsJson: JSON.stringify(item),
   totalcartitems: cartItems.length,
-  reference: generateReservationId(),
+  reference: reservationId,
   subReference: cartId.toString(),
   adults: parseInt(item.numAdults) || 0,
-  children: parseInt(item.numChildren) || 0,
+  children: parseInt(item.numKids) || 0,
   resStart: item.resStart,
   resEnd: item.resEnd,
   tentsites: item.tentsites || 0,
@@ -279,7 +245,11 @@ export const createBooking = async (
   possource: "CAPGEMNI_RIDEFINDER",   // ? corrected
 };
    
-   
+  let numAdults = parseInt(item.numAdults) || 0;
+  let numChildren = parseInt(item.numKids) || 0;
+  let someparkId = item.park?.parkId || 0;
+  let postresstart = item.resStart || resStart;
+  let postresend = item.resEnd || resEnd;
 
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
@@ -306,7 +276,7 @@ export const createBooking = async (
          localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
   		// ? Update park inventory with total guests
   		const totalGuests = bookingPayload.quantityAdults + bookingPayload.quantityChildren;
-  		await updateParkInventoryAndCalendar(bookingPayload.parkGuid, totalGuests);
+  		await updateParkInventoryAndCalendar(bookingPayload.parkGuid, totalGuests, numAdults, numChildren, someparkId, transactionId, reservationId, postresstart, postresend);
         // Delay navigation so user sees spinner/message
         setTimeout(() => {
           navigate("/home");
@@ -321,98 +291,4 @@ export const createBooking = async (
     }
   }
 };
-
-/*
-
-//THIS IS THE OLD FORMAT NOT USED ANYMORE
-
-export const oldcreateBooking = async (transactionId: string) => {
-  const cartItems = getCartFromLocalStorage();
-
-  if (!cartItems || !Array.isArray(cartItems)) {
-    console.error("No cart items found in localStorage.");
-    alert("Fetching cart failed!");
-    return;
-  }
-
-  // ✅ Generate one ReservationId for the entire booking
-  const reservationId = generateReservationId();
-
-  for (const item of cartItems) {
-    const cartId = generateCartId();
-
-    const numDays = item.numDays || 1;
-    const resStart = new Date();
-    const resEnd = new Date(
-      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
-    );
-
-    const bookingPayload = {
-      uid: localStorage.getItem("uid") || "10000", // ✅ match schema casing
-      creditCardType: "Visa",
-      creditCardLast4: "1234",
-      creditCardExpDate: "12/25",
-      transactionId: transactionId,
-      cartid: cartId.toString(),
-      parkId: 1000,
-      parkGuid: item.id,
-      numDays: item.numDays,
-      reservationtype: "Biking",
-      reservationstatus: "Active",
-      resStart: formatDate(resStart), //"2025-12-10T00:00:00",resStart was failing on the backend previously due to date formatting. But the Payload should be the variable resStart
-      resEnd: 	formatDate(resEnd),					//"2025-12-12T00:00:00",     //resEnd was failing on the backed But the Payload should be the variable resEnd....
-      parkName: item.park?.parkName || "SomeCGPark",
-      quantityAdults: parseInt(item.numAdults) || 0,
-      quantityChildren: parseInt(item.numChildren) || 0,
-      customerBillingName: localStorage.getItem("fullname") || "John Doe",
-      cartDetailsJson: JSON.stringify(item)
-    };
-
-    alert("trying to book!");
-    console.log("booking", bookingPayload);
-
-    try {
-      const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingPayload),
-      });
-
-      localStorage.setItem(`Booking1_${cartId}`, JSON.stringify(bookingPayload));
-
-      if (response.ok) {
-        // ✅ Handle JSON or empty body safely
-        const contentType = response.headers.get("content-type");
-        let result: any;
-        if (contentType && contentType.includes("application/json")) {
-          result = await response.json();
-        } else {
-          result = await response.text(); // may be empty or plain text
-        }
-
-        console.log("Booking created successfully:", result);
-
-        // ✅ Save each booking separately under its CartId key
-        const bookingRecord = {
-          ReservationId: reservationId, // one reservation for all
-          CartId: cartId,
-          BookingInfo: bookingPayload,
-          userid: localStorage.getItem("userid") || "guest",
-          useridasstring: localStorage.getItem("userid") || "guest",
-          paymentId: transactionId,
-          };
-
-        localStorage.setItem(`Booking2_${cartId}`, JSON.stringify(bookingRecord));
-
-        alert(`Booking Successful!\nReservation ID: ${reservationId}\nCart ID: ${cartId}`);
-      } else {
-        console.error("Booking failed:", response.status, response.statusText);
-        console.error("Error body:", await response.text());
-      }
-    } catch (error) {
-      console.error("Error posting booking:", error);
-    }
-  }
-};*/
-
 
