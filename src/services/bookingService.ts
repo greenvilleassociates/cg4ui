@@ -29,8 +29,8 @@ import { Dispatch, SetStateAction } from "react";
       {
       	parkId: parkId.toString(),        
         customerId: 33,  
-        startDate: someresstart.toISOString() || now,
-        endDate: someresend.toISOString() || now,            
+        startDate: someresstart || now,
+        endDate: someresend || now,            
         transactionId: sometransactionId,
         bookId: somebookingId,
         qtyAdults: numAdults,
@@ -104,8 +104,8 @@ export const postCartToCGCart = async (transactionId: string) => {
       numAdults,
       numChildren,
       numDays,
-      resStart: resStart.toISOString(),
-      resEnd: resEnd.toISOString(),
+      resStart: item.resStartDate || resEnd, //If the Item is populated properly... it can be any date....
+      resEnd: item.resEndDate || resStart,   //If its not populated it takes the current date and adds the num days.
       totalPrice: (numAdults * (item.park?.adultPrice || 0)) +
                   (numChildren * (item.park?.childPrice || 0)),
     };
@@ -237,8 +237,8 @@ export const createBooking = async (
   subReference: cartId.toString(),
   adults: parseInt(item.numAdults) || 0,
   children: parseInt(item.numKids) || 0,
-  resStart: item.resStart,
-  resEnd: item.resEnd,
+  resStart: item.resStartDate || resStart,
+  resEnd: item.resEndDate || resEnd,
   tentsites: item.tentsites || 0,
   parkGuid: item.park?.id || "",
   numDays: item.numDays || 1,
@@ -248,8 +248,8 @@ export const createBooking = async (
   let numAdults = parseInt(item.numAdults) || 0;
   let numChildren = parseInt(item.numKids) || 0;
   let someparkId = item.park?.parkId || 0;
-  let postresstart = item.resStart || resStart;
-  let postresend = item.resEnd || resEnd;
+  let postresstart = item.resStartDate || resStart;
+  let postresend = item.resEndDate || resEnd;
 
     try {
       const response = await fetch("https://parksapi.547bikes.info/api/Booking", {
