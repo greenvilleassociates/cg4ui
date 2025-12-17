@@ -58,7 +58,7 @@ function Logout() {
     // Simulate a short delay for UX
     setTimeout(() => {
       setLoading(false);
-      navigate("/login");
+      navigate("/auth");
     }, 2000);
   }, [navigate]);
 

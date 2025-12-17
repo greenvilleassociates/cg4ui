@@ -16,6 +16,7 @@ import Details2 from './pages/Details2';
 import AllReviews from './pages/AllReviews';
 import Logout from './pages/Logout';
 import Manager from './pages/Manager';
+import ParkManager from './pages/ParkManager';
 import SecurityAdmin from './pages/SecurityAdmin';
 import Reservations from './pages/Reservations';
 import AuthLogin from './pages/AuthLogin';
@@ -52,6 +53,7 @@ function App() {
         <Route path="/login" caseSensitive={false} element={<Login />} />
         <Route path="/logout" caseSensitive={false} element={<Logout />} />
         <Route path="/manager" caseSensitive={false} element={<Manager />} />
+        <Route path="/parkmanager" caseSensitive={false} element={<ParkManager />} />
         <Route path="/securityadmin" caseSensitive={false} element={<SecurityAdmin />} />
         <Route path="/reservations" caseSensitive={false} element={<Reservations />} />
         <Route path="/register" caseSensitive={false} element={<Register />} />  

@@ -12,7 +12,11 @@ export default interface IPark {
     imageUrl?: string;
     adultPrice: number;
     childPrice: number;
+    //ADDED BY JOHN STRITZINGER TO NORMALIZE SCHEMAS BETWEEN CGUI AND PARKS DB.
     parkId: number;
     someLat: number;
     someLong: number;
+    maxVisitors: number;
+    currentVisitors: number;
+    reviewAverage: number;
 }

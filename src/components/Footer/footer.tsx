@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import SecurityIcon from "@mui/icons-material/Security";
+import ForestIcon from "@mui/icons-material/Forest";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./footer.css";
@@ -15,7 +16,8 @@ export default function Footer() {
   useEffect(() => {
     if (location.pathname.startsWith("/reservations")) setValue(0);
     else if (location.pathname.startsWith("/securityadmin")) setValue(1);
-    else if (location.pathname.startsWith("/manager")) setValue(2);
+  	else if (location.pathname.startsWith("/parkmanager")) setValue(2);
+    else if (location.pathname.startsWith("/manager")) setValue(3);
   }, [location.pathname]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -28,6 +30,9 @@ export default function Footer() {
         navigate("/securityadmin");
         break;
       case 2:
+        navigate("/parkmanager");
+        break;
+      case 3:
         navigate("/manager");
         break;
     }
@@ -48,10 +53,11 @@ export default function Footer() {
       >
         <BottomNavigationAction label="Reservations" icon={<EventNoteIcon />} />
         <BottomNavigationAction label="Security Admin" icon={<SecurityIcon />} />
+        <BottomNavigationAction label="ParkManager" icon={<ForestIcon />} />
         <BottomNavigationAction label="Manager" icon={<ManageAccountsIcon />} />
       </BottomNavigation>
       <div style={{ fontSize: "0.75rem", marginTop: "4px" }}>
-        &copy; {currentYear} 547Bikes.Info, CapGemeni Consulting, Cocky Consulting,
+        &copy; {currentYear} 547Bikes.Info, CapGemeni Consulting,
         Greenville Associates Consulting, All Rights Reserved.
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import "./details2.css";
 
 const Details2 = () => {
@@ -14,8 +14,8 @@ const Details2 = () => {
   const [parkName, setParkName] = useState("");
   const [parkIndex, setParkIndex] = useState("");
   const [parkGUID, setParkGUID] = useState("");
-  const [parkDetails, setParkDetails] = useState<any>(null);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [parkDetails, setParkDetails] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
@@ -24,15 +24,15 @@ const Details2 = () => {
         const res = await fetch("https://parksapi.547bikes.info/api/Parks");
         if (res.ok) {
           const data = await res.json();
-          const match = data.find((p: any) => String(p.id) === String(parkGuid));
+          const match = data.find((p) => String(p.id) === String(parkGuid));
           if (match) {
             setParkName(match.name);
             setParkIndex(match.parkId);
             setParkDetails(match);
             setParkGUID(match.id);
 
-            localStorage.setItem("SomeParkIndex", match.parkId || "");
-            localStorage.setItem("SomeParkName", match.name || "");
+            localStorage.setItem("SomeParkIndex", match.parkId || null);
+            localStorage.setItem("SomeParkName", match.name || null);
 
             // Fetch reviews immediately on page load
             fetchReviews(match.parkId);
@@ -49,11 +49,14 @@ const Details2 = () => {
     if (parkGuid) fetchParks();
   }, [parkGuid]);
 
-  const fetchReviews = async (parkId: string) => {
+  const fetchReviews = async (parkId) => {
     try {
       const revRes = await fetch(
         `https://parksapi.547bikes.info/api/ParkReview/parkid/${parkId}`
       );
+    
+      const somepark = revRes.name;
+      localStorage.setItem("temppark",somepark);
       if (revRes.ok) {
         const revData = await revRes.json();
         setReviews(revData);
@@ -63,14 +66,14 @@ const Details2 = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const review = {
       parkId: parseInt(parkIndex, 10),
-      userId: parseInt(userId as string, 10),
+      userId: parseInt(userId, 10),
       description,
-      stars: parseInt(stars as any, 10),
+      stars: parseInt(stars, 10),
       datePosted: new Date().toISOString(),
       dateApproved: null,
       dateDenied: null,
@@ -80,9 +83,9 @@ const Details2 = () => {
       displayname: localStorage.getItem("fullname") || "Some Displayname",
       fullname: localStorage.getItem("fullname") || "Some Name",
       possource: "CAPGEMENI_UI",
-      parkGuid: parkGUID,
+      parkGuid: parkGUID
     };
-
+      //POSOURCE: "CAPGEMENI_UI"
     const response = await fetch("https://parksapi.547bikes.info/api/ParkReview", {
       method: "POST",
       headers: {
@@ -145,35 +148,9 @@ const Details2 = () => {
               <strong>Day Pass Price:</strong> ${parkDetails.dayPassPriceUsd}
             </p>
 
-            {/* --- Location with Google Maps links --- */}
-{parkDetails?.someLat && parkDetails?.someLong && (
-  <div style={{ marginTop: "1rem" }}>
-    <p>
-      <strong>Location:</strong> {parkDetails.someLat}, {parkDetails.someLong}
-    </p>
-    <a
-      href={`https://www.google.com/maps?q=${parkDetails.someLat},${parkDetails.someLong}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="d2btn d2btn-secondary"
-      style={{ marginRight: "0.5rem" }}
-    >
-      View on Google Maps
-    </a>
-    <a
-      href={`https://www.google.com/maps/dir/?api=1&destination=${parkDetails.someLat},${parkDetails.someLong}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="d2btn d2btn-secondary"
-    >
-      Driving Directions
-    </a>
-  </div>
-)}
-
             {/* --- FEATURES CHECKBOXES IN SUMMARY --- */}
             <div className="d2-form-group">
-              <div className="d2-features-row">
+                <div className="d2-features-row">
                 {["skiing", "camping", "rafting", "canoeing", "motocross"].map(
                   (feat) => (
                     <label key={feat} className="d2-feature-item">
@@ -204,37 +181,37 @@ const Details2 = () => {
 
           {/* --- REVIEW FORM --- */}
           {showForm && (
-            <form onSubmit={handleSubmit} className="d2-review-form">
-              <div className="d2-form-inline">
-                <label>
-                  Stars:
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={stars}
-                    onChange={(e) => setStars(Number(e.target.value))}
-                    className="d2-input-stars"
-                  />
-                </label>
+  <form onSubmit={handleSubmit} className="d2-review-form">
+    <div className="d2-form-inline">
+      <label>
+        Stars:
+        <input
+          type="number"
+          min="1"
+          max="5"
+          value={stars}
+          onChange={(e) => setStars(e.target.value)}
+          className="d2-input-stars"
+        />
+      </label>
 
-                <label>
-                  Description:
-                  <input
-                    type="text"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    maxLength={200}
-                    className="d2-input-description"
-                  />
-                </label>
-              </div>
+      <label>
+        Description:
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          maxLength={200}
+          className="d2-input-description"
+        />
+      </label>
+    </div>
 
-              <button type="submit" className="d2btn d2btn-primary">
-                Submit Review
-              </button>
-            </form>
-          )}
+    <button type="submit" className="d2btn d2btn-primary">
+      Submit Review
+    </button>
+  </form>
+)}
         </div>
 
         {/* --- EXISTING REVIEWS --- */}
@@ -270,4 +247,4 @@ const Details2 = () => {
   );
 };
 
-export default Details2;
+export default Details2;*/

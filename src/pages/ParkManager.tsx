@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const Manager: React.FC = () => {
+const ParkManager: React.FC = () => {
   const [hasPermission, setHasPermission] = useState(false);
 
   // helper function to post to /api/Adminlogs
@@ -49,7 +49,7 @@ const Manager: React.FC = () => {
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <iframe
-        src="https://home.547bikes.info/reactmanager.html"
+        src="https://home.547bikes.info/parkmaint.html"
         title="Manager"
         style={{ border: "none", width: "100%", height: "100%" }}
       />
@@ -57,4 +57,4 @@ const Manager: React.FC = () => {
   );
 };
 
-export default Manager;
+export default ParkManager;

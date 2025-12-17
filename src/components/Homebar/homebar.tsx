@@ -53,7 +53,7 @@ export default function Homebar({ numItems }: HomebarProps) {
             cursor: 'pointer',
           }}
         >
-          [CG.UI.V13.5.121525.3.00P.G.OTHER]
+          [CG.V15.3]
         </Typography>
 
         {/* Spacer */}
@@ -63,7 +63,7 @@ export default function Homebar({ numItems }: HomebarProps) {
         <Button component={Link} to="/" sx={{ color: 'inherit' }}>
           <HomeIcon />
         </Button>
-        <IconButton component={Link} to="/login" color="inherit" aria-label="Login">
+        <IconButton component={Link} to="/auth" color="inherit" aria-label="Login">
  			<LoginIcon />
 		</IconButton>
   		<IconButton component={Link} to="/logout" color="inherit" aria-label="Logout">
@@ -73,13 +73,7 @@ export default function Homebar({ numItems }: HomebarProps) {
         <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
           RideFinder
         </Button>
-        <Button component={Link} to="/allreviews" sx={{ color: 'inherit' }}>
-          AllReviews
-        </Button>
-        <Button component={Link} to="/home2" sx={{ color: 'inherit' }}>
-          AllParks
-        </Button>
-
+   
         {/* Menu button (hamburger) */}
         <IconButton
           color="inherit"
@@ -108,8 +102,14 @@ export default function Homebar({ numItems }: HomebarProps) {
           <MenuItem component={Link} to="/register" onClick={handleMenuClose}>
             Signup
           </MenuItem>
-           <MenuItem component={Link} to="/auth" onClick={handleMenuClose}>
-            Auth Login
+            <MenuItem component={Link} to="/home2" onClick={handleMenuClose}>
+            All Parks
+          </MenuItem>
+           <MenuItem component={Link} to="/allreviews" onClick={handleMenuClose}>
+           All Reviews
+          </MenuItem>
+           <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
+            Simple Login
           </MenuItem>
           <MenuItem onClick={() => { toggleTheme(); handleMenuClose(); }}>
             {darkTheme ? (

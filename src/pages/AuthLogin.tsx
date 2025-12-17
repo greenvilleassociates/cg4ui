@@ -39,7 +39,7 @@ function AuthLogin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: username,
-          plainPassword: password,   // <-- matches backend requirement
+          plainPassword: password, // <-- matches backend requirement
         }),
       });
 
@@ -48,20 +48,26 @@ function AuthLogin() {
       }
 
       const user = await response.json();
+      console.log("Authpayload", user);
 
       if (user) {
-        // Save user record to localStorage (same as Login.tsx)
+        // Save user record to localStorage with correct field mappings
         localStorage.setItem("loggedInUser", JSON.stringify(user));
         localStorage.setItem("status", "loggedin");
-        localStorage.setItem("uid", user.userid || 0);
-        localStorage.setItem("uidstring", user.uidstring || "");
-        localStorage.setItem("fullname", user.fullname || "");
-        localStorage.setItem("username", user.username || "");
-        localStorage.setItem("firstname", user.firstname || "");
-        localStorage.setItem("lastname", user.lastname || "");
-        localStorage.setItem("email", user.email || "");
 
-        setMessage(`Welcome, ${user.firstname} ${user.lastname}!`);
+        // Map backend fields correctly
+        localStorage.setItem("uid", user.userId?.toString() || "0");
+        localStorage.setItem("uidstring", user.userJid || "");
+        localStorage.setItem("fullname", user.userFullName || "");
+        localStorage.setItem("username", user.userUsername || "");
+        localStorage.setItem("firstname", user.userFirstname || "");
+        localStorage.setItem("lastname", user.userLastname || "");
+        localStorage.setItem("role", user.userRole || "");
+        localStorage.setItem("email", user.userEmail || "");
+        localStorage.setItem("employeeId", user.employeeId || "");
+        localStorage.setItem("token", user.token || "");
+
+        setMessage(`Welcome, ${user.userFirstname} ${user.userLastname}!`);
 
         // Redirect after short delay
         setTimeout(() => {
@@ -97,7 +103,7 @@ function AuthLogin() {
           {!loading ? (
             <>
               <Typography variant="h5" color="primary" gutterBottom>
-                Authenticate
+                547Bikes AuthSecure&copy;
               </Typography>
               <form onSubmit={handleAuth}>
                 <TextField
@@ -150,3 +156,4 @@ function AuthLogin() {
 }
 
 export default AuthLogin;
+

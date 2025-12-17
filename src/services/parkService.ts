@@ -40,7 +40,7 @@ private async fetchRemoteParks(): Promise<IPark[]> {
         const localParks = mockData.map((val) => JSON.parse(JSON.stringify(val)));
         const remoteParks = await this.fetchRemoteParks();
 
-        const combined = [...localParks, ...remoteParks];
+        const combined = [...remoteParks, ...localParks];
 
         return new Promise((res) => {
             setTimeout(() => {

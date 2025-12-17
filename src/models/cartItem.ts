@@ -5,6 +5,7 @@ export interface CartItem {
     numDays: number;
     numAdults: number;
     numKids: number;
+    //ADDED BY JOHN S. STRITZINGER -> CART ITEMS NOT SUFFICIENT
     resStartDate: string;   // ISO date string (YYYY-MM-DD)
     resEndDate: string;     // auto-generated from start + numDays
     parkId: number;

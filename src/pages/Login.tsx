@@ -82,6 +82,7 @@ function Login() {
         localStorage.setItem("firstname", matchedUser.firstname || null);
         localStorage.setItem("lastname", matchedUser.lastname || null);
         localStorage.setItem("email", matchedUser.email || null);
+        localStorage.setItem("role", matchedUser.role || null); //ADDED DECEMBER 12/16 SO THAT WE CAN LOCK MANAGER FUNCTIONS. CHECKADMINPLL...
 
         setMessage(`Welcome, ${matchedUser.firstname} ${matchedUser.lastname}!`);
         setLoading(true);
@@ -120,7 +121,7 @@ function Login() {
           {!loading ? (
             <>
               <Typography variant="h5" color="primary" gutterBottom>
-                Login
+                547Bikes Basic User Login
               </Typography>
               <form onSubmit={handleLogin}>
                 <TextField

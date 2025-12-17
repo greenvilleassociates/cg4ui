@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";   // <-- add useNavigate
+import { Link, useLocation, useNavigate } from "react-router-dom";   // <-- add useNavigate
 import {
   Card,
   CardHeader,
@@ -12,6 +12,8 @@ import {
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import StarIcon from "@mui/icons-material/Star";
 import "./allreviews.css";
+import "./parkcard.css";
+
 
 export default function AllReviews() {
   const location = useLocation();
@@ -118,14 +120,18 @@ export default function AllReviews() {
                 </Typography>
 
                 {/* NEW BUTTON TO ROUTE TO DETAILS */}
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  style={{ marginTop: "0.5rem" }}
-                  onClick={() => navigate(`/details/${review.parkGuid}`)}
-                >
-                  View Details
-                </Button>
+               <Button
+  				component={Link}
+  				to={`/details2?parkid=${review.parkGuid}`}
+  				variant="outlined"
+  				color="secondary"
+  				style={{ marginTop: "0.5rem" }}
+				>
+  				ParkDetails
+				</Button>
+              
+              
+              
               </CardContent>
             </Card>
           );
