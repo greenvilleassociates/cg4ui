@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
+import 'material-symbols';
 import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import './Navbar.css';
@@ -38,7 +39,20 @@ export default function Homebar({ numItems }: HomebarProps) {
   return (
     <AppBar position="sticky" sx={{ backgroundColor: 'black', color: 'white' }}>
       <Toolbar>
-        {/* Left side: logo/title */}
+        {/* Menu button on far left */}
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-controls={open ? 'nav-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleMenuClick}
+          sx={{ mr: 2 }}
+        >
+          <MenuIcon />
+        </IconButton>
+
+        {/* Title */}
         <Typography
           noWrap
           component={Link}
@@ -47,43 +61,41 @@ export default function Homebar({ numItems }: HomebarProps) {
             mr: 2,
             fontFamily: 'Impact, Haettenschweiler, Arial Narrow Bold, sans-serif',
             fontWeight: 700,
-            color: "inherit",
+            color: "#CC5500",
             textDecoration: 'none',
-            fontSize: '1.7rem',
+            fontSize: '1.4rem', // ~10pt/.625 for mobile
             cursor: 'pointer',
           }}
+          className="titleText" // optional CSS override
         >
-          [CG.V15.3]
+          RIDEFINDER (CG.V15dot5)
         </Typography>
 
-        {/* Spacer */}
+        {/* Spacer pushes rest to right */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Main buttons (always visible) */}
+        {/* Main buttons */}
+    <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
+      <span
+        className="material-symbols-outlined"
+        style={{ color: '#CC5500', fontSize: '2rem', marginRight: '0.5rem' }}
+      >
+        motorcycle
+      </span>
+      RideFinder
+    </Button>
         <Button component={Link} to="/" sx={{ color: 'inherit' }}>
           <HomeIcon />
         </Button>
         <IconButton component={Link} to="/auth" color="inherit" aria-label="Login">
- 			<LoginIcon />
-		</IconButton>
-  		<IconButton component={Link} to="/logout" color="inherit" aria-label="Logout">
-  			<LogoutIcon />
-		</IconButton>
-
-        <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
-          RideFinder
-        </Button>
-   
-        {/* Menu button (hamburger) */}
-        <IconButton
-          color="inherit"
-          aria-controls={open ? 'nav-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleMenuClick}
-        >
-          <MenuIcon />
+          <LoginIcon />
         </IconButton>
+        <IconButton component={Link} to="/logout" color="inherit" aria-label="Logout">
+          <LogoutIcon />
+        </IconButton>
+    
+
+        {/* Menu dropdown */}
         <Menu
           id="nav-menu"
           anchorEl={anchorEl}
@@ -102,13 +114,13 @@ export default function Homebar({ numItems }: HomebarProps) {
           <MenuItem component={Link} to="/register" onClick={handleMenuClose}>
             Signup
           </MenuItem>
-            <MenuItem component={Link} to="/home2" onClick={handleMenuClose}>
+          <MenuItem component={Link} to="/home2" onClick={handleMenuClose}>
             All Parks
           </MenuItem>
-           <MenuItem component={Link} to="/allreviews" onClick={handleMenuClose}>
-           All Reviews
+          <MenuItem component={Link} to="/allreviews" onClick={handleMenuClose}>
+            All Reviews
           </MenuItem>
-           <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
+          <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
             Simple Login
           </MenuItem>
           <MenuItem onClick={() => { toggleTheme(); handleMenuClose(); }}>
@@ -142,3 +154,4 @@ export default function Homebar({ numItems }: HomebarProps) {
     </AppBar>
   );
 }
+

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="login.css" />
+<link rel="stylesheet" href="dropmenu.css" />
+<script src="./js/bikes.js"></script>
+  <title>Cancel Reservation</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+
+#userGreeting
+{
+text-align: center;
+vertical-align: middle;
+color: white;
+}
+#banner
+{
+background-color: lightgrey;
+height: 60px;
+vertical-align: middle;
+width: 100%;
+}
+
+#cancelBtn
+{
+width: 400px;
+}
+
+</style>
+
+</head>
+<body onload="checkpll(); checkUserStatus();">
+    <div align="center" id="banner"><span id="userGreeting">Welcome Guest</span></div>
+  <div class="container py-5">
+  <h3 class="text-center mb-4">Booking Details</h3>
+  <div class="card mx-auto" style="max-width: 700px;">
+    <div class="card-body">
+      <p><strong>Booking ID:</strong> <span id="bookingId"></span></p>
+      <p><strong>User ID:</strong> <span id="uid"></span></p>
+      <p><strong>Billing Telephone:</strong> <span id="billingTelephoneNumber"></span></p>
+      <p><strong>Credit Card Type:</strong> <span id="creditCardType"></span></p>
+      <p><strong>Card Last 4:</strong> <span id="creditCardLast4"></span></p>
+      <p><strong>Card Expiry:</strong> <span id="creditCardExpDate"></span></p>
+      <p><strong>Billing Name:</strong> <span id="customerBillingName"></span></p>
+      <p><strong>Adults:</strong> <span id="quantityAdults"></span></p>
+      <p><strong>Children:</strong> <span id="quantityChildren"></span></p>
+      <p><strong>Total Amount:</strong> $<span id="totalAmount"></span></p>
+      <p><strong>Transaction ID:</strong> <span id="transactionId"></span></p>
+      <p><strong>Reverse Transaction ID:</strong> <span id="reversetransactionid"></span></p>
+      <p><strong>Refund Amount:</strong> <span id="refundamount"></span></p>
+      <p><strong>Park ID:</strong> <span id="parkId"></span></p>
+      <p><strong>Park Name:</strong> <span id="parkName"></span></p>
+      <p><strong>Cart ID:</strong> <span id="cartid"></span></p>
+      <p><strong>Reservation Type:</strong> <span id="reservationtype"></span></p>
+      <p><strong>Reservation Status:</strong> <span id="reservationstatus"></span></p>
+    <hr>
+        <p class="text-danger" id="CustomerAlert">Are you sure you want to cancel this reservation?</p>
+        <button id="cancelBtn" class="btn btn-danger" onclick="confirmCancellation()">Confirm Cancellation</button>
+        <button class="btn btn-secondary" onclick="window.location.href='mybookings5.html'">Go Back</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+ <script>
+  // Generate a 3-letter + 6-digit reverse transaction ID
+  function generateReverseTransactionId() {
+    const alpha = Array.from({ length: 3 }, () =>
+      String.fromCharCode(65 + Math.floor(Math.random() * 26))
+    ).join("");
+    const numeric = Math.floor(100000 + Math.random() * 900000);
+    return alpha + numeric;
+  }
+
+  $(document).ready(function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('bookingid');
+    const cartId = urlParams.get('cartid');
+
+    // Load booking details
+    $.ajax({
+      url: `https://gridactions3b.547bikes.info/api/Booking/${bookingId}`,
+      method: "GET",
+      success: function (bookings) {
+        if (!Array.isArray(bookings) || bookings.length === 0) {
+          alert("No booking found.");
+          return;
+        }
+
+        const booking = bookings[0];
+
+        // Populate booking fields
+        $("#bookingId").text(booking.bookingId);
+        $("#uid").text(booking.uid);
+        $("#billingTelephoneNumber").text(booking.billingTelephoneNumber);
+        $("#creditCardType").text(booking.creditCardType);
+        $("#creditCardLast4").text(booking.creditCardLast4);
+        $("#creditCardExpDate").text(booking.creditCardExpDate);
+        $("#customerBillingName").text(booking.customerBillingName);
+        $("#quantityAdults").text(booking.quantityAdults);
+        $("#quantityChildren").text(booking.quantityChildren);
+        $("#totalAmount").text(
+          !isNaN(parseFloat(booking.totalAmount)) ? parseFloat(booking.totalAmount).toFixed(2) : "0.00"
+        );
+        $("#transactionId").text(booking.transactionId);
+        $("#reversetransactionid").text(booking.reversetransactionid);
+       $("#refundamount").text(
+  booking.cancellationrefund != null && !isNaN(booking.cancellationrefund)
+    ? booking.cancellationrefund.toFixed(2)
+    : "0.00"
+);
+        $("#parkId").text(booking.parkId);
+        $("#parkName").text(booking.parkName);
+        $("#cartid").text(booking.cartid);
+        $("#reservationtype").text(booking.reservationtype);
+        $("#reservationstatus").text(booking.reservationstatus);
+
+        // Highlight and disable if already cancelled
+        if (booking.reversetransactionid && booking.reversetransactionid.trim() !== "") {
+          const reverseElem = document.getElementById("reversetransactionid");
+          reverseElem.style.backgroundColor = "yellow";
+          reverseElem.style.padding = "2px 6px";
+          reverseElem.style.borderRadius = "4px";
+          reverseElem.style.fontWeight = "bold";
+          const customerNotice = document.getElementById("CustomerAlert");
+          customerNotice.innerHTML = "This item has already been cancelled and refunded to the card on file!";
+          $("#cancelBtn").prop("disabled", true).text("Already Cancelled");
+        }
+      },
+      error: function () {
+        alert("Failed to load booking details.");
+      }
+    });
+  });
+
+  // Cancel reservation
+  function confirmCancellation() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('bookingid');
+    const cartId = urlParams.get('cartid');
+
+    $.ajax({
+      url: `https://gridactions3b.547bikes.info/api/Cart/${cartId}`,
+      method: "GET",
+      success: function (cart) {
+        const originalAmount = parseFloat(cart.totalAmount);
+        const refundAmount = parseFloat($("#totalAmount").text());
+
+        alert(`Reservation will be cancelled.\nRefund Amount: $${refundAmount}`);
+
+        const reverseId = generateReverseTransactionId();
+        $("#reversetransactionid").text(reverseId);
+
+        const reverseElem = document.getElementById("reversetransactionid");
+        reverseElem.style.backgroundColor = "yellow";
+        reverseElem.style.padding = "2px 6px";
+        reverseElem.style.borderRadius = "4px";
+        reverseElem.style.fontWeight = "bold";
+
+        $.ajax({
+          url: `https://gridactions3b.547bikes.info/api/Booking/${bookingId}`,
+          method: "PUT",
+          contentType: "application/json",
+          data: JSON.stringify({
+            reservationstatus: "Cancelled",
+            bookingId: bookingId,
+            reservationtype: "Biking",
+            reversetransactionid: reverseId,
+          	cancellationrefund: refundAmount
+          }),
+          success: function () {
+            alert("Reservation cancelled successfully.");
+            reversepayment();
+            window.location.href = "mybookings5.html";
+          },
+          error: function () {
+            alert("Failed to cancel reservation.");
+            console.log(`https://gridactions3b.547bikes.info/api/Booking/${bookingId}`);
+          }
+        });
+      },
+      error: function () {
+        alert("Unable to retrieve cart details.");
+      }
+    });
+  }
+ 
+ function reversepayment() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookingId = urlParams.get("bookingid");
+  const cartId = urlParams.get("cartid");
+
+  $.ajax({
+    url: `https://gridactions3b.547bikes.info/api/Booking/${bookingId}`,
+    method: "GET",
+    success: function (bookings) {
+      if (!Array.isArray(bookings) || bookings.length === 0) {
+        alert("Booking not found.");
+        return;
+      }
+
+      const booking = bookings[0];
+      const refundAmount = parseFloat(booking.totalAmount);
+      const reverseId = $("#reversetransactionid").text();
+
+      const payment = {
+        transtype: "Reversal", // ← new field added
+        amount: refundAmount * -1,
+        uid: booking.uid,
+        cartid: booking.cartid,
+        paymentmethod: booking.creditCardType,
+        last4: booking.creditCardLast4,
+        relatedtransactionid: booking.transactionId,
+        reversetransactionid: reverseId,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log("Posting reversal payment:", payment);
+
+      $.ajax({
+        url: "https://gridactions3b.547bikes.info/api/Payments",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(payment),
+        success: function () {
+          alert("Reversal transaction successfully recorded.");
+        },
+        error: function (xhr) {
+          console.error("❌ Failed to record reversal:", xhr.responseText);
+          alert("Failed to record reversal transaction.");
+        }
+      });
+    },
+    error: function () {
+      alert("Failed to retrieve booking for reversal.");
+    }
+  });
+}
+ 
+ 
+</script>
+
+
+
+  <!-- Footer -->
+  <footer class="footer text-center mt-5">
+    &copy; Cocky Consulting 2025. <br> All rights reserved.<br>
+    <a href="sitemap.html" class="sitelink">SiteMap</a>
+  </footer>
+</body>
+</html>

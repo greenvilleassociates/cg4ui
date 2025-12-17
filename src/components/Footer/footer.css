@@ -14,7 +14,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100px;         /* reserve exactly 100px */
+  height: 80px;         /* reserve exactly 100px */
   background-color: #BF5700; /* burnt orange */
   color: white;
   display: flex;
@@ -23,6 +23,7 @@
   align-items: center;
   border-top: 2px solid #ddd;
   z-index: 1000;
+  font-size: 10pt;
 }
 
 /* Ensure page content doesn't overlap footer */

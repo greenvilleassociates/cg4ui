@@ -11,7 +11,7 @@ private async fetchRemoteParks(): Promise<IPark[]> {
             throw new Error(`Failed to fetch parks: ${response.statusText}`);
         }
         const data = await response.json();
-
+		console.log("dirtbikeapi",data);
         const today = new Date().toISOString();
 
         // Reset dates to today
@@ -39,7 +39,7 @@ private async fetchRemoteParks(): Promise<IPark[]> {
     getAllParks: () => Promise<IPark[]> = async () => {
         const localParks = mockData.map((val) => JSON.parse(JSON.stringify(val)));
         const remoteParks = await this.fetchRemoteParks();
-
+		
         const combined = [...remoteParks, ...localParks];
 
         return new Promise((res) => {

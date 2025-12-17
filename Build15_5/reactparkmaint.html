@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="login.css">
+ <link rel="stylesheet" href="dropmenu.css" />
+<script src="./js/bikes.js"></script>
+  <title>Park Maintenance</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body onload="checkpll(); checkUserStatus(); ">
+  <div align="center" id="banner"><span id="userGreeting">Welcome Guest</span></div>
+  <div class="container py-5">
+   <div align="center"><img src="./images/centralpark.png" width="100%" height="350px"></div><BR>
+    <div class="mb-4 text-center">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addParkModal">Add New Park</button>
+      <button class="btn btn-warning" id="updateParkBtn" disabled data-bs-toggle="modal" data-bs-target="#updateParkModal">Update Selected Park</button>
+      <button id="deleteParkBtn" class="btn btn-danger" disabled>Delete Selected Park</button>
+    </div>
+  
+  <div class="mb-4">
+  <label for="stateFilter" class="form-label">Filter by State:</label>
+  <select id="stateFilter" class="form-select" onchange="filterParksByState()">
+    <option value="all">All States</option>
+    <option value="AL">Alabama</option>
+    <option value="AK">Alaska</option>
+    <option value="AZ">Arizona</option>
+    <option value="AR">Arkansas</option>
+    <option value="CA">California</option>
+    <option value="CO">Colorado</option>
+    <option value="CT">Connecticut</option>
+    <option value="DE">Delaware</option>
+    <option value="FL">Florida</option>
+    <option value="GA">Georgia</option>
+    <option value="HI">Hawaii</option>
+    <option value="ID">Idaho</option>
+    <option value="IL">Illinois</option>
+    <option value="IN">Indiana</option>
+    <option value="IA">Iowa</option>
+    <option value="KS">Kansas</option>
+    <option value="KY">Kentucky</option>
+    <option value="LA">Louisiana</option>
+    <option value="ME">Maine</option>
+    <option value="MD">Maryland</option>
+    <option value="MA">Massachusetts</option>
+    <option value="MI">Michigan</option>
+    <option value="MN">Minnesota</option>
+    <option value="MS">Mississippi</option>
+    <option value="MO">Missouri</option>
+    <option value="MT">Montana</option>
+    <option value="NE">Nebraska</option>
+    <option value="NV">Nevada</option>
+    <option value="NH">New Hampshire</option>
+    <option value="NJ">New Jersey</option>
+    <option value="NM">New Mexico</option>
+    <option value="NY">New York</option>
+    <option value="NC">North Carolina</option>
+    <option value="ND">North Dakota</option>
+    <option value="OH">Ohio</option>
+    <option value="OK">Oklahoma</option>
+    <option value="OR">Oregon</option>
+    <option value="PA">Pennsylvania</option>
+    <option value="RI">Rhode Island</option>
+    <option value="SC">South Carolina</option>
+    <option value="SD">South Dakota</option>
+    <option value="TN">Tennessee</option>
+    <option value="TX">Texas</option>
+    <option value="UT">Utah</option>
+    <option value="VT">Vermont</option>
+    <option value="VA">Virginia</option>
+    <option value="WA">Washington</option>
+    <option value="WV">West Virginia</option>
+    <option value="WI">Wisconsin</option>
+    <option value="WY">Wyoming</option>
+  </select>
+</div>
+
+
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Select</th>
+            <th>Park ID</th>
+            <th>Park Name</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Region</th>
+            <th>State</th>
+            <th>Trail Length (mi)</th>
+            <th>Difficulty</th>
+            <th>Description</th>
+            <th>Day Cost</th>
+            <th>LAT</th>
+            <th>LONG</th>
+            <th>Trail Map</th>
+            <th>Logo</th>
+            <th>Adults</th>
+            <th>Children</th>
+            <th>MaxVisitors</th>
+             <th>Adults</th>
+            <th>Children</th>
+            <th>CurrentVisitors</th>
+            <th>CurrentChildren/th>
+            <th>CurrentAdults</th>
+            <th>Logo</th>
+             <td>${park.maxvisitors}</td>
+        <td>${park.currentvisitors}</td>
+        <td>${park.currentvisitorschildren}</td>
+        <td>${park.currentvisitorsadults}</td>
+        <td>${park.maxcampsites}</td>
+          </tr>
+        </thead>
+        <tbody id="park-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+ <!-- Add Park Modal -->
+<div class="modal fade" id="addParkModal" tabindex="-1" aria-labelledby="addParkModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <form id="addParkForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addParkModalLabel">Add New Park</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body row g-3">
+          <div class="col-md-6">
+            <label for="addName" class="form-label">Park Name</label>
+            <input type="text" class="form-control" id="addName" name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label for="addRegion" class="form-label">Region</label>
+            <input type="text" class="form-control" id="addRegion" name="region">
+          </div>
+          <div class="col-md-6">
+            <label for="addState" class="form-label">State</label>
+            <input type="text" class="form-control" id="addState" name="state">
+          </div>
+          <div class="col-md-6">
+            <label for="addAddress" class="form-label">Address</label>
+            <input type="text" class="form-control" id="addAddress" name="address">
+          </div>
+          <div class="col-md-6">
+            <label for="addPhone" class="form-label">Phone</label>
+            <input type="text" class="form-control" id="addPhone" name="phone">
+          </div>
+          <div class="col-md-6">
+            <label for="addTrailLength" class="form-label">Trail Length (mi)</label>
+            <input type="number" step="0.1" class="form-control" id="addTrailLength" name="trailLengthMiles">
+          </div>
+          <div class="col-md-6">
+            <label for="addDifficulty" class="form-label">Difficulty</label>
+            <input type="text" class="form-control" id="addDifficulty" name="difficulty">
+          </div>
+          <div class="col-md-6">
+            <label for="addDayPass" class="form-label">Day Pass ($)</label>
+            <input type="number" step="0.01" class="form-control" id="addDayPass" name="dayPassPriceUsd">
+          </div>
+          <div class="col-md-6">
+            <label for="addMaxVisitors" class="form-label">Max Visitors</label>
+            <input type="number" class="form-control" id="addMaxVisitors" name="maxvisitors">
+          </div>
+          <div class="col-md-6">
+            <label for="addCurrentVisitors" class="form-label">Current Visitors</label>
+            <input type="number" class="form-control" id="addCurrentVisitors" name="currentvisitors">
+          </div>
+          <div class="col-md-6">
+            <label for="addAdults" class="form-label">Adults</label>
+            <input type="number" class="form-control" id="addAdults" name="currentvisitorsadults">
+          </div>
+          <div class="col-md-6">
+            <label for="addChildren" class="form-label">Children</label>
+            <input type="number" class="form-control" id="addChildren" name="currentvisitorschildren">
+          </div>
+          <div class="col-md-6">
+            <label for="addMaxCampsites" class="form-label">Max Campsites</label>
+            <input type="number" class="form-control" id="addMaxCampsites" name="maxcampsites">
+          </div>
+          <div class="col-md-6">
+            <label for="addTrailMapUrl" class="form-label">Trail Map URL</label>
+            <input type="url" class="form-control" id="addTrailMapUrl" name="trailmapurl">
+          </div>
+          <div class="col-md-6">
+            <label for="addLogoUrl" class="form-label">Logo URL</label>
+            <input type="url" class="form-control" id="addLogoUrl" name="parklogourl">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update Park Modal -->
+<div class="modal fade" id="updateParkModal" tabindex="-1" aria-labelledby="updateParkModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <form id="updateParkForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateParkModalLabel">Update Park</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body row g-3">
+          <input type="hidden" id="updateParkId" name="parkId">
+
+          <!-- Basic Info -->
+          <div class="col-md-6"><label for="updateName" class="form-label">Park Name</label><input type="text" class="form-control" id="updateName" name="name" required></div>
+          <div class="col-md-6"><label for="updateAddress" class="form-label">Address</label><input type="text" class="form-control" id="updateAddress" name="address"></div>
+          <div class="col-md-6"><label for="updatePhone" class="form-label">Phone</label><input type="text" class="form-control" id="updatePhone" name="phone"></div>
+          <div class="col-md-6"><label for="updateRegion" class="form-label">Region</label><input type="text" class="form-control" id="updateRegion" name="region"></div>
+          <div class="col-md-6"><label for="updateState" class="form-label">State</label><input type="text" class="form-control" id="updateState" name="state"></div>
+
+          <!-- Trail Info -->
+          <div class="col-md-6"><label for="updateTrailLength" class="form-label">Trail Length (miles)</label><input type="number" step="0.01" class="form-control" id="updateTrailLength" name="trailLengthMiles"></div>
+          <div class="col-md-6"><label for="updateDifficulty" class="form-label">Difficulty</label><input type="text" class="form-control" id="updateDifficulty" name="difficulty"></div>
+          <div class="col-md-12"><label for="updateDescription" class="form-label">Description</label><textarea class="form-control" id="updateDescription" name="description" rows="3"></textarea></div>
+
+          <!-- Pricing & Location -->
+          <div class="col-md-6"><label for="updateDayPassPrice" class="form-label">Day Pass Price (USD)</label><input type="number" step="0.01" class="form-control" id="updateDayPassPrice" name="dayPassPriceUsd"></div>
+          <div class="col-md-6"><label for="updateLatitude" class="form-label">Latitude</label><input type="number" step="0.000001" class="form-control" id="updateLatitude" name="latitude"></div>
+          <div class="col-md-6"><label for="updateLongitude" class="form-label">Longitude</label><input type="number" step="0.000001" class="form-control" id="updateLongitude" name="longitude"></div>
+
+          <!-- URLs -->
+          <div class="col-md-6"><label for="updateTrailMapUrl" class="form-label">Trail Map URL</label><input type="url" class="form-control" id="updateTrailMapUrl" name="trailmapurl"></div>
+          <div class="col-md-6"><label for="updateParkLogoUrl" class="form-label">Park Logo URL</label><input type="url" class="form-control" id="updateParkLogoUrl" name="parklogourl"></div>
+
+          <!-- Visitor Info -->
+          <div class="col-md-6"><label for="updateMaxVisitors" class="form-label">Max Visitors</label><input type="number" class="form-control" id="updateMaxVisitors" name="maxvisitors"></div>
+          <div class="col-md-6"><label for="updateCurrentVisitors" class="form-label">Current Visitors</label><input type="number" class="form-control" id="updateCurrentVisitors" name="currentvisitors"></div>
+          <div class="col-md-6"><label for="updateCurrentChildren" class="form-label">Current Children Visitors</label><input type="number" class="form-control" id="updateCurrentChildren" name="currentvisitorschildren"></div>
+          <div class="col-md-6"><label for="updateCurrentAdults" class="form-label">Current Adult Visitors</label><input type="number" class="form-control" id="updateCurrentAdults" name="currentvisitorsadults"></div>
+
+          <!-- Camping & Layout -->
+          <div class="col-md-6"><label for="updateMaxCampsites" class="form-label">Max Campsites</label><input type="number" class="form-control" id="updateMaxCampsites" name="maxcampsites"></div>
+          <div class="col-md-6"><label for="updateColumns" class="form-label">Columns</label><input type="number" class="form-control" id="updateColumns" name="columns"></div>
+
+          <!-- Image URLs -->
+          <div class="col-md-6"><label for="updatePic1Url" class="form-label">Picture 1 URL</label><input type="url" class="form-control" id="updatePic1Url" name="pic1url"></div>
+          <div class="col-md-6"><label for="updatePic2Url" class="form-label">Picture 2 URL</label><input type="url" class="form-control" id="updatePic2Url" name="pic2url"></div>
+          <div class="col-md-6"><label for="updatePic3Url" class="form-label">Picture 3 URL</label><input type="url" class="form-control" id="updatePic3Url" name="pic3url"></div>
+          <div class="col-md-6"><label for="updatePic4Url" class="form-label">Picture 4 URL</label><input type="url" class="form-control" id="updatePic4Url" name="pic4url"></div>
+          <div class="col-md-6"><label for="updatePic5Url" class="form-label">Picture 5 URL</label><input type="url" class="form-control" id="updatePic5Url" name="pic5url"></div>
+          <div class="col-md-6"><label for="updatePic6Url" class="form-label">Picture 6 URL</label><input type="url" class="form-control" id="updatePic6Url" name="pic6url"></div>
+          <div class="col-md-6"><label for="updatePic7Url" class="form-label">Picture 7 URL</label><input type="url" class="form-control" id="updatePic7Url" name="pic7url"></div>
+          <div class="col-md-6"><label for="updatePic8Url" class="form-label">Picture 8 URL</label><input type="url" class="form-control" id="updatePic8Url" name="pic8url"></div>
+          <div class="col-md-6"><label for="updatePic9Url" class="form-label">Picture 9 URL</label><input type="url" class="form-control" id="updatePic9Url" name="pic9url"></div>
+
+          <!-- Park Type -->
+          <div class="col-md-6 form-check">
+            <input class="form-check-input" type="checkbox" id="updateIsNationalPark" name="isnationalpark" value="1">
+            <label class="form-check-label" for="updateIsNationalPark">Is National Park</label>
+          </div>
+          <div class="col-md-6 form-check">
+            <input class="form-check-input" type="checkbox" id="updateIsStatePark" name="isstatepark" value="1">
+            <label class="form-check-label" for="updateIsStatePark">Is State Park</label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-warning">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let allParks = [];
+  let selectedPark = null;
+
+$(document).ready(function () {
+  $.ajax({
+    url: "https://parksapi.547bikes.info/api/Parks",
+    method: "GET",
+    success: function (parks) {
+      allParks = parks;
+      renderParkTable(parks);
+    },
+    error: function (xhr, status, error) {
+      $("#park-table-body").html(
+        `<tr><td colspan="16" class="text-danger">Error loading park data: ${error}</td></tr>`
+      );
+    }
+  });
+});
+
+    // Render table with optional filtering
+   function renderParkTable(parks) {
+  const tableBody = $("#park-table-body");
+  tableBody.empty();
+
+  parks.forEach(function (park) {
+    const trailMap = park.trailmapurl
+      ? `<a href="${park.trailmapurl}" target="_blank">Map</a>`
+      : `<span class="text-muted">N/A</span>`;
+
+    const logo = park.parklogourl
+      ? `<img src="${park.parklogourl}" alt="Logo" style="max-height:40px;">`
+      : `<span class="text-muted">N/A</span>`;
+
+    const imagePreview = (url) =>
+      url ? `<img src="${url}" alt="Image" style="max-height:40px;">` : `<span class="text-muted">N/A</span>`;
+
+    const isNational = park.isnationalpark == 1 || park.isnationalpark === "1" ? "✅" : "❌";
+    const isState = park.isstatepark == 1 || park.isstatepark === "1" ? "✅" : "❌";
+
+    const row = `
+      <tr>
+        <td><input type="radio" name="selectedPark" value="${park.parkId}"></td>
+        <td>${park.parkId}</td>
+        <td>${park.name}</td>
+        <td>${park.address}</td>
+        <td>${park.phone}</td>
+        <td>${park.region}</td>
+        <td>${park.state}</td>
+        <td>${park.trailLengthMiles}</td>
+        <td>${park.difficulty}</td>
+        <td>${park.description}</td>
+        <td>${typeof park.dayPassPriceUsd === "number" ? park.dayPassPriceUsd.toFixed(2) : "N/A"}</td>
+        <td>${park.latitude}</td>
+        <td>${park.longitude}</td>
+        <td>${trailMap}</td>
+        <td>${logo}</td>
+        <td>${park.maxvisitors}</td>
+        <td>${park.currentvisitors}</td>
+        <td>${park.currentvisitorschildren}</td>
+        <td>${park.currentvisitorsadults}</td>
+        <td>${park.maxcampsites}</td>
+      </tr>
+    `;
+
+    tableBody.append(row);
+  });
+}
+
+
+    
+    // Filter parks by selected state
+    window.filterParksByState = function () {
+      const selectedState = $("#stateFilter").val();
+      const filtered = selectedState === "all"
+        ? allParks
+        : allParks.filter(p => p.state === selectedState);
+      renderParkTable(filtered);
+    };
+
+    // Enable update button when a park is selected
+    $(document).on("change", "input[name='selectedPark']", function () {
+      selectedPark = $(this).val();
+      $("#updateParkBtn").prop("disabled", !selectedPark);
+    });
+
+$("#updateParkBtn").on("click", function () {
+  const park = allParks.find(p => Number(p.parkId) === Number(selectedPark));
+  if (park) {
+    // Hidden ID
+    $("#updateParkId").val(Number(park.parkId));
+
+    // Basic Info
+    $("#updateName").val(park.name || '');
+    $("#updateAddress").val(park.address || '');
+    $("#updatePhone").val(park.phone || '');
+    $("#updateRegion").val(park.region || '');
+    $("#updateState").val(park.state || '');
+
+    // Trail Info
+    $("#updateTrailLength").val(Number(park.trailLengthMiles) || 0);
+    $("#updateDifficulty").val(park.difficulty || '');
+    $("#updateDescription").val(park.description || '');
+
+    // Pricing & Location
+    $("#updateDayPassPrice").val(Number(park.dayPassPriceUsd) || 0);
+    $("#updateLatitude").val(Number(park.latitude) || 0);
+    $("#updateLongitude").val(Number(park.longitude) || 0);
+
+    // URLs
+    $("#updateTrailMapUrl").val(park.trailmapurl || '');
+    $("#updateParkLogoUrl").val(park.parklogourl || '');
+
+    // Visitor Info
+    $("#updateMaxVisitors").val(Number(park.maxvisitors) || 0);
+    $("#updateCurrentVisitors").val(Number(park.currentvisitors) || 0);
+    $("#updateCurrentChildren").val(Number(park.currentvisitorschildren) || 0);
+    $("#updateCurrentAdults").val(Number(park.currentvisitorsadults) || 0);
+
+    // Camping & Layout
+    $("#updateMaxCampsites").val(Number(park.maxcampsites) || 0);
+    $("#updateColumns").val(Number(park.columns) || 0);
+
+    // Image URLs
+    $("#updatePic1Url").val(park.pic1url || '');
+    $("#updatePic2Url").val(park.pic2url || '');
+    $("#updatePic3Url").val(park.pic3url || '');
+    $("#updatePic4Url").val(park.pic4url || '');
+    $("#updatePic5Url").val(park.pic5url || '');
+    $("#updatePic6Url").val(park.pic6url || '');
+    $("#updatePic7Url").val(park.pic7url || '');
+    $("#updatePic8Url").val(park.pic8url || '');
+    $("#updatePic9Url").val(park.pic9url || '');
+
+    // Park Type (checkboxes)
+    $("#updateIsNationalPark").prop("checked", park.isnationalpark == 1 || park.isnationalpark === "1");
+    $("#updateIsStatePark").prop("checked", park.isstatepark == 1 || park.isstatepark === "1");
+  }
+});
+
+    // Handle Add Park form submission
+    $("#addParkForm").on("submit", function (e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+      $.ajax({
+        url: "https://parksapi.547bikes.info/api/Parks",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: () => location.reload(),
+        error: () => alert("Error adding park")
+      });
+    });
+
+// Handle Update Park form submission
+$("#updateParkForm").on("submit", function (e) {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(this));
+  console.log(data); // ✅ Log the data before sending
+
+  $.ajax({
+    url: `https://parksapi.547bikes.info/api/Parks/${data.parkId}`,
+    method: "PUT",
+    contentType: "application/json",
+    data: JSON.stringify(data),
+    success: () => location.reload(),
+    error: () => alert("Error updating park")
+  });
+});
+
+$("#deleteParkBtn").on("click", function () {
+  if (!selectedPark) return;
+
+  const confirmed = confirm("Are you sure you want to delete this park?");
+  if (!confirmed) return;
+
+  $.ajax({
+    url: `https://parksapi.547bikes.info/api/Parks/${selectedPark}`,
+    method: "DELETE",
+    success: () => {
+      alert("Park deleted successfully.");
+      location.reload();
+    },
+    error: () => {
+      alert("Error deleting park.");
+    }
+  });
+});
+
+
+
+
+$(document).on("change", "input[name='selectedPark']", function () {
+  selectedPark = $(this).val();
+  $("#updateParkBtn").prop("disabled", !selectedPark);
+  $("#deleteParkBtn").prop("disabled", !selectedPark); // Enable delete button
+});
+
+</script>
+ 
+  <!-- Footer -->
+  <footer class="footer text-center mt-5">
+    &copy; Cocky Consulting 2025. <br> All rights reserved.<br>
+    <a href="sitemap.html" class="sitelink">SiteMap</a>
+  </footer>
+</body>
+</html>

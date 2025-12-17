@@ -145,14 +145,13 @@ const Details2 = () => {
               <strong>Day Pass Price:</strong> ${parkDetails.dayPassPriceUsd}
             </p>
 
-            {/* --- Location with Google Maps links --- */}
-{parkDetails?.someLat && parkDetails?.someLong && (
+{parkDetails?.latitude != null && parkDetails?.longitude != null && (
   <div style={{ marginTop: "1rem" }}>
     <p>
-      <strong>Location:</strong> {parkDetails.someLat}, {parkDetails.someLong}
+      <strong>Location:</strong> {parkDetails.latitude}, {parkDetails.longitude}
     </p>
     <a
-      href={`https://www.google.com/maps?q=${parkDetails.someLat},${parkDetails.someLong}`}
+      href={`https://www.google.com/maps?q=${parkDetails.latitude},${parkDetails.longitude}`}
       target="_blank"
       rel="noopener noreferrer"
       className="d2btn d2btn-secondary"
@@ -161,7 +160,7 @@ const Details2 = () => {
       View on Google Maps
     </a>
     <a
-      href={`https://www.google.com/maps/dir/?api=1&destination=${parkDetails.someLat},${parkDetails.someLong}`}
+      href={`https://www.google.com/maps/dir/?api=1&destination=${parkDetails.latitude},${parkDetails.longitude}`}
       target="_blank"
       rel="noopener noreferrer"
       className="d2btn d2btn-secondary"
