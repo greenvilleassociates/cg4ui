@@ -1,59 +1,72 @@
 .flex {
-    border: 2px solid black;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    background-color: white;
-    z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 0.5em 1em;
+  border-bottom: 2px solid #ddd; /* cleaner than full border */
+  z-index: 1000;
 }
 
 .cartNumber {
-    color: white;
-    background-color: red;
-    position: absolute;
-    font-size: .75em;
-    border-radius: 100%;
-    width: 25%;
-    right: 1em;
-    top: -.25em;
+  color: white;
+  background-color: red;
+  position: absolute;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 0.5em;
+  top: -0.25em;
 }
 
 .inner-flex {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .right {
-    align-self: flex-end;
+  align-self: flex-end;
 }
 
 .title-arrow {
-    width: 25px;
+  width: 25px;
 }
 
 .title-text > a {
-    padding-bottom: .25em;
-    font-weight: bold;
-    text-decoration: none;
-    color: black;
+  padding-bottom: 0.25em;
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
 }
 
 .title-text > a:hover {
-    color: #D06817;
+  color: #D06817;
 }
 
 .display {
-    position: relative;
-    padding: 0 1em;
+  position: relative;
+  padding: 0 1em;
 }
 
 .titleText {
   font-size: 0.625rem; /* 10pt for mobile */
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 @media (min-width: 600px) {
   .titleText {
     font-size: 1rem; /* scale up on larger screens */
   }
+}
+
+.RF {
+  font-size: 0.75rem; /* use rem for consistency */
+  font-weight: bold;
+  color: #CC5500; /* matches your brand orange */
 }

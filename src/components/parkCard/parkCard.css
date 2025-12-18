@@ -13,6 +13,7 @@
     background-color: white;
     box-shadow: 0 4px 6px #DEE2E6;
     align-items: stretch;
+    margin: 0 auto;
 }
 
 .card-text {

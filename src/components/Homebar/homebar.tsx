@@ -37,8 +37,18 @@ export default function Homebar({ numItems }: HomebarProps) {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: 'black', color: 'white' }}>
-      <Toolbar>
+<AppBar
+  position="sticky"
+  sx={{
+    backgroundColor: 'black',
+    color: 'white',
+    width: '100%',
+    margin: 0,
+    left: 0,
+    right: 0
+  }}
+>
+      <Toolbar sx={{ gap: 0.5 }}>
         {/* Menu button on far left */}
         <IconButton
           edge="start"
@@ -56,7 +66,7 @@ export default function Homebar({ numItems }: HomebarProps) {
         <Typography
           noWrap
           component={Link}
-          to="/"
+          to="/home"
           sx={{
             mr: 2,
             fontFamily: 'Impact, Haettenschweiler, Arial Narrow Bold, sans-serif',
@@ -68,7 +78,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           }}
           className="titleText" // optional CSS override
         >
-          RIDEFINDER (CG.V15dot5)
+          [RFV15.5]
         </Typography>
 
         {/* Spacer pushes rest to right */}
@@ -82,8 +92,8 @@ export default function Homebar({ numItems }: HomebarProps) {
       >
         motorcycle
       </span>
-      RideFinder
-    </Button>
+       <span class="RF">Ridefinder</span>
+   </Button>
         <Button component={Link} to="/" sx={{ color: 'inherit' }}>
           <HomeIcon />
         </Button>

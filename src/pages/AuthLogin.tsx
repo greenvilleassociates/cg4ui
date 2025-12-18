@@ -20,6 +20,73 @@ const theme = createTheme({
   },
 });
 
+
+// utils/api.js
+async function createSession(u) {
+  let someuid = Number(u.userId);
+  if (isNaN(someuid)) {
+    someuid = 1;
+  }
+
+  const sometoken = u.token || "defaulttoken";
+
+  // Build session description and start date
+  const currentDate = new Date();
+  const somestartdate = currentDate.toISOString();
+  const somesessiondescription =
+    "User: " +
+    (u.userFullName || localStorage.getItem("fullname")) +
+    " is on LOGIN as a " +
+    u.userRole +
+    " On Date: " +
+    somestartdate;
+
+  // Full payload matching your format
+  const somedata = {
+    userid: someuid,
+    useridasstring: String(u.userId),
+    token: sometoken,
+    acknowledged: 0,
+    actionpriority: 0,
+    sessionstart: somestartdate,
+    sessionend: "", // active login
+    sessionrecorded: 0,
+    sessionrecordurl: "", // blank
+    sessiondescription: somesessiondescription,
+    sessionusername: u.userUsername,
+    sessionemail: u.userEmail,
+    sessionfirstname: u.userFirstname,
+    sessionlastname: u.userLastname,
+    sessionfullname: u.userFullName,
+    sessioncomplete: 0,
+	twofactorkey: "string",
+  	twofactorkeysmsdestination: "string",
+  	twofactorkeyemaildestination: "string",
+  	twofactorprovider: "string",
+  	twofactorprovidertoken: "string",
+  	twofactorproviderauthstring: "string",
+  	};
+
+  console.log("Posting session:", somedata);
+
+  try {
+    const response = await fetch("https://parksapi.547bikes.info/api/Usersession", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(somedata)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Record posted successfully:", result);
+  } catch (error) {
+    console.error("Error posting record:", error, somedata);
+  }
+}
+
 function AuthLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -68,7 +135,7 @@ function AuthLogin() {
         localStorage.setItem("token", user.token || "");
 
         setMessage(`Welcome, ${user.userFirstname} ${user.userLastname}!`);
-
+		createSession(user);
         // Redirect after short delay
         setTimeout(() => {
           navigate("/home");
