@@ -78,7 +78,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           }}
           className="titleText" // optional CSS override
         >
-          [RFV15.5]
+          [RFV15.6]
         </Typography>
 
         {/* Spacer pushes rest to right */}
