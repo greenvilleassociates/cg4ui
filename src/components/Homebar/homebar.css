@@ -53,20 +53,39 @@
   padding: 0 1em;
 }
 
-.titleText {
-  font-size: 0.625rem; /* 10pt for mobile */
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-
-@media (min-width: 600px) {
-  .titleText {
-    font-size: 1rem; /* scale up on larger screens */
-  }
-}
 
 .RF {
   font-size: 0.75rem; /* use rem for consistency */
   font-weight: bold;
   color: #CC5500; /* matches your brand orange */
+}
+
+.menu-button {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+/* Default title styling (desktop/tablet) */
+.titleText {
+  font-size: 0.50rem; /* matches your inline style */
+}
+
+/* Responsive adjustment for smaller screens */
+@media screen and (max-width: 800px) {
+  .titleText {
+    font-size: 0.49rem;   /* smaller text */
+  }
+}
+
+@media (min-width: 600px) {
+  .titleText {
+    font-size: .48rem; /* scale up on larger screens */
+  }
+}
+
+/* You can go even smaller for very narrow devices */
+@media screen and (max-width: 500px) {
+  .titleText {
+    font-size: 0.45rem;
+  }
 }

@@ -37,17 +37,17 @@ export default function Homebar({ numItems }: HomebarProps) {
   };
 
   return (
-<AppBar
-  position="sticky"
-  sx={{
-    backgroundColor: 'black',
-    color: 'white',
-    width: '100%',
-    margin: 0,
-    left: 0,
-    right: 0
-  }}
->
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: 'black',
+        color: 'white',
+        width: '100%',
+        margin: 0,
+        left: 0,
+        right: 0
+      }}
+    >
       <Toolbar sx={{ gap: 0.5 }}>
         {/* Menu button on far left */}
         <IconButton
@@ -58,6 +58,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           aria-expanded={open ? 'true' : undefined}
           onClick={handleMenuClick}
           sx={{ mr: 2 }}
+          className="menu-button"
         >
           <MenuIcon />
         </IconButton>
@@ -73,37 +74,37 @@ export default function Homebar({ numItems }: HomebarProps) {
             fontWeight: 700,
             color: "#CC5500",
             textDecoration: 'none',
-            fontSize: '.89rem', // ~10pt/.625 for mobile
+            fontSize: '.50rem',
             cursor: 'pointer',
           }}
-          className="titleText" // optional CSS override
+          className="titleText"
         >
-          [RFV15.7]
+          [RFV15.8]
         </Typography>
 
         {/* Spacer pushes rest to right */}
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Main buttons */}
-        <Button component={Link} to="/" sx={{ color: 'inherit' }}>
+       <Button component={Link} to="/home" className="menu-button" color="inherit">
+          <span
+            className="material-symbols-outlined"
+            style={{ color: '#CC5500', fontSize: '1.5rem', marginRight: '0.5rem' }}
+          >
+            motorcycle
+          </span>
+          <span className="RF">Ridefinder</span>
+        </Button>
+       <Button component={Link} to="/" className="menu-button" color="inherit">
           <HomeIcon />
         </Button>
-    <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
-      <span
-        className="material-symbols-outlined"
-        style={{ color: '#CC5500', fontSize: '2rem', marginRight: '0.5rem' }}
-      >
-        motorcycle
-      </span>
-       <span class="RF">Ridefinder</span>
-   </Button>
-        <IconButton component={Link} to="/auth" color="inherit" aria-label="Login">
+        <IconButton component={Link} to="/auth" color="inherit" aria-label="Login" className="menu-button">
           <LoginIcon />
         </IconButton>
-        <IconButton component={Link} to="/authlogout" color="inherit" aria-label="Logout">
+
+        <IconButton component={Link} to="/authlogout" color="inherit" aria-label="Logout" className="menu-button">
           <LogoutIcon />
         </IconButton>
-    
 
         {/* Menu dropdown */}
         <Menu
@@ -130,7 +131,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           <MenuItem component={Link} to="/allreviews" onClick={handleMenuClose}>
             All Reviews
           </MenuItem>
-        <MenuItem component={Link} to="/viz" onClick={handleMenuClose}>
+          <MenuItem component={Link} to="/viz" onClick={handleMenuClose}>
             Park Vizualizations
           </MenuItem>
           <MenuItem component={Link} to="/logout" onClick={handleMenuClose}>
@@ -162,7 +163,7 @@ export default function Homebar({ numItems }: HomebarProps) {
         </Menu>
 
         {/* Cart with badge */}
-        <IconButton component={Link} to="/cart" color="inherit">
+        <IconButton component={Link} to="/cart" color="inherit" className="menu-button">
           <ShoppingCartIcon />
           {numItems > 0 && <span className="cartNumber">{numItems}</span>}
         </IconButton>
@@ -170,4 +171,5 @@ export default function Homebar({ numItems }: HomebarProps) {
     </AppBar>
   );
 }
+
 
