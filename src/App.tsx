@@ -10,16 +10,18 @@ import { useEffect, useState } from 'react';
 import Homebar from './components/Homebar/homebar';
 import Footer from './components/Footer/footer';
 import Welcome from './pages/Welcome';
-import Login from './pages/Login';
+import Login from './pages/BasicLogin';
 import Register from './pages/Register';
 import Details2 from './pages/Details2';
 import AllReviews from './pages/AllReviews';
-import Logout from './pages/Logout';
+import Logout from './pages/BasicLogout';
 import Manager from './pages/Manager';
 import ParkManager from './pages/ParkManager';
 import SecurityAdmin from './pages/SecurityAdmin';
 import Reservations from './pages/Reservations';
 import AuthLogin from './pages/AuthLogin';
+import AuthLogout from './pages/AuthLogout';
+import Viz from './pages/Visualizations';
 
 function App() {
   const parkService = new ParkService();
@@ -57,7 +59,9 @@ function App() {
         <Route path="/securityadmin" caseSensitive={false} element={<SecurityAdmin />} />
         <Route path="/reservations" caseSensitive={false} element={<Reservations />} />
         <Route path="/register" caseSensitive={false} element={<Register />} />  
+        <Route path="/authlogout" caseSensitive={false} element={<AuthLogout />} />  
         <Route path="/auth" caseSensitive={false} element={<AuthLogin />} />  
+        <Route path="/viz" caseSensitive={false} element={<Viz />} />  
         <Route
           path="/home"
           caseSensitive={false}

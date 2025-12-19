@@ -73,18 +73,21 @@ export default function Homebar({ numItems }: HomebarProps) {
             fontWeight: 700,
             color: "#CC5500",
             textDecoration: 'none',
-            fontSize: '1.4rem', // ~10pt/.625 for mobile
+            fontSize: '.89rem', // ~10pt/.625 for mobile
             cursor: 'pointer',
           }}
           className="titleText" // optional CSS override
         >
-          [RFV15.6]
+          [RFV15.7]
         </Typography>
 
         {/* Spacer pushes rest to right */}
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Main buttons */}
+        <Button component={Link} to="/" sx={{ color: 'inherit' }}>
+          <HomeIcon />
+        </Button>
     <Button component={Link} to="/home" sx={{ color: 'inherit' }}>
       <span
         className="material-symbols-outlined"
@@ -94,13 +97,10 @@ export default function Homebar({ numItems }: HomebarProps) {
       </span>
        <span class="RF">Ridefinder</span>
    </Button>
-        <Button component={Link} to="/" sx={{ color: 'inherit' }}>
-          <HomeIcon />
-        </Button>
         <IconButton component={Link} to="/auth" color="inherit" aria-label="Login">
           <LoginIcon />
         </IconButton>
-        <IconButton component={Link} to="/logout" color="inherit" aria-label="Logout">
+        <IconButton component={Link} to="/authlogout" color="inherit" aria-label="Logout">
           <LogoutIcon />
         </IconButton>
     
@@ -130,8 +130,14 @@ export default function Homebar({ numItems }: HomebarProps) {
           <MenuItem component={Link} to="/allreviews" onClick={handleMenuClose}>
             All Reviews
           </MenuItem>
+        <MenuItem component={Link} to="/viz" onClick={handleMenuClose}>
+            Park Vizualizations
+          </MenuItem>
+          <MenuItem component={Link} to="/logout" onClick={handleMenuClose}>
+            Basic Logout
+          </MenuItem>
           <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
-            Simple Login
+            Basic Login
           </MenuItem>
           <MenuItem onClick={() => { toggleTheme(); handleMenuClose(); }}>
             {darkTheme ? (

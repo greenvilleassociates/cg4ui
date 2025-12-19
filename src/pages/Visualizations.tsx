@@ -1,14 +1,11 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-const Reservations: React.FC = () => {
-  const navigate = useNavigate();
-
+const Viz: React.FC = () => {
   // helper function to post to /user/Action
   const postUserAction = async () => {
     try {
       const someuserid = parseInt(localStorage.getItem("uid") || "0");
-      const someuid = parseInt(localStorage.getItem("uid") || "0");
+      const someuid = parseInt(localStorage.getItem("uid")) || 0;
       const somedescription = `Reservations accessed by: ${someuid}`;
       
       await fetch("https://parksapi.547bikes.info/api/Useraction", {
@@ -25,28 +22,20 @@ const Reservations: React.FC = () => {
     }
   };
 
+  // Post log when component mounts
   useEffect(() => {
-    const uid = localStorage.getItem("uid");
-
-    // ✅ Redirect if uid is missing or guest (901)
-    if (!uid || uid === "901") {
-      navigate("/auth");
-      return; // stop further execution
-    }
-
-    // Otherwise, log the user action
     postUserAction();
-  }, [navigate]);
+  }, []);
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <iframe
-        src="reactmybookings5.html"
-        title="Reservations"
+        src="./reactvisualizations.html"
+        title="Visualizations"
         style={{ border: "none", width: "100%", height: "100%" }}
       />
     </div>
   );
 };
 
-export default Reservations;
+export default Viz;

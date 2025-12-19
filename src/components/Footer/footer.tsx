@@ -3,6 +3,7 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import SecurityIcon from "@mui/icons-material/Security";
 import ForestIcon from "@mui/icons-material/Forest";
+import DataExplorationIcon from '@mui/icons-material/DataExploration';
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./footer.css";
@@ -35,6 +36,9 @@ export default function Footer() {
       case 3:
         navigate("/manager");
         break;
+      case 4:
+        navigate("/viz");
+        break;
     }
   };
 
@@ -55,10 +59,10 @@ export default function Footer() {
         <BottomNavigationAction label="Security Admin" icon={<SecurityIcon />} />
         <BottomNavigationAction label="ParkManager" icon={<ForestIcon />} />
         <BottomNavigationAction label="Manager" icon={<ManageAccountsIcon />} />
+        <BottomNavigationAction label="Viz" icon={<DataExplorationIcon />} />
       </BottomNavigation>
       <div style={{ fontSize: "0.75rem", marginTop: "4px" }}>
-        &copy; {currentYear} 547Bikes.Info, CapGemeni Consulting,
-        Greenville Associates Consulting, All Rights Reserved.
+        &copy; {currentYear} 547Bikes.Info,CapGemeni,Greenville Associates,All Rights Reserved.
       </div>
     </div>
   );

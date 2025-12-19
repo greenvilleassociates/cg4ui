@@ -36,7 +36,7 @@ export default function DetailsPage(props: detailsPageProps) {
     if (uid === null || uid === "901") 
     {
     alert("You cannot book service without logging in.");
-    navigate("/login");
+    navigate("/auth");
     }
   }, [navigate]);
 

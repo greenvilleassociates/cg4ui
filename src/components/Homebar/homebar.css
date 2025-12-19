@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   background-color: white;
-  padding: 0.5em 1em;
+  padding: 0.5em 0.75em;
   border-bottom: 2px solid #ddd; /* cleaner than full border */
   z-index: 1000;
 }
