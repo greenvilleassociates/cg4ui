@@ -57,7 +57,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           onClick={handleMenuClick}
-          sx={{ mr: 2 }}
+          sx={{ mr: 1 }}
           className="menu-button"
         >
           <MenuIcon />
@@ -69,17 +69,17 @@ export default function Homebar({ numItems }: HomebarProps) {
           component={Link}
           to="/home"
           sx={{
-            mr: 2,
+            mr: 1,
             fontFamily: 'Impact, Haettenschweiler, Arial Narrow Bold, sans-serif',
             fontWeight: 700,
             color: "#CC5500",
             textDecoration: 'none',
-            fontSize: '.40rem',
+            fontSize: '.55rem',
             cursor: 'pointer',
           }}
           className="titleText"
         >
-          V15.9
+          [RF.V10]
         </Typography>
 
         {/* Spacer pushes rest to right */}
@@ -95,7 +95,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           </span>
           <span className="RF">Ridefinder</span>
         </Button>
-       <Button component={Link} to="/" className="menu-button" color="inherit">
+       <Button component={Link} to="/home" className="menu-button" color="inherit">
           <HomeIcon />
         </Button>
         <IconButton component={Link} to="/auth" color="inherit" aria-label="Login" className="menu-button">

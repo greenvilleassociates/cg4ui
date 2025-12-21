@@ -120,6 +120,7 @@ export const postCartToCGCart = async (transactionId: string) => {
     transactionTotal: cartTotalPrice, // use stored CartTotalPrice
     paymentId: transactionId,
     items,
+    useremail: localStorage.getItem("email")
   };
   
   console.log("CGARTPOST", JSON.stringify(CGpayload));
