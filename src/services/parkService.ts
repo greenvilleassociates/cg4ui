@@ -76,7 +76,7 @@ const mockData: IPark[] = [
         childPrice: 15,
 	someLat: 0.0,
 	someLong: 0.0,
-	parkId: 1001,
+	parkId: 998,
         imageUrl: "https://placehold.co/600x400/334155/FFF?text=Motobike+Mayhem",
         reviews: [
             {
@@ -138,7 +138,7 @@ const mockData: IPark[] = [
         childPrice: 15,
 	someLat: 0.0,
 	someLong: 0.0,
-	parkId: 1002,
+	parkId: 999,
         imageUrl: "https://placehold.co/600x400/3321a5/FFF?text=Crossbar+Parkway",
         reviews: [
             {

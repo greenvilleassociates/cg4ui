@@ -22,7 +22,7 @@ import { Dispatch, SetStateAction } from "react";
       return false;
     }
     console.log("Park inventory updated successfully");
-
+	
     // ? Build calendar payload
     const now = new Date().toISOString();
     const calendarPayload = 
@@ -113,6 +113,7 @@ export const postCartToCGCart = async (transactionId: string) => {
 
   // ✅ Instead of recalculating, pull CartTotalPrice from localStorage
   const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
+ const parkId = cartItems[0]?.park?.parkId;
 
   const CGpayload = {
     userId: parseInt(localStorage.getItem("userid") || "0"),
@@ -120,7 +121,8 @@ export const postCartToCGCart = async (transactionId: string) => {
     transactionTotal: cartTotalPrice, // use stored CartTotalPrice
     paymentId: transactionId,
     items,
-    useremail: localStorage.getItem("email")
+    useremail: localStorage.getItem("email"),
+  	parkId: parkId
   };
   
   console.log("CGARTPOST", JSON.stringify(CGpayload));
@@ -220,10 +222,10 @@ export const createBooking = async (
   creditCardType: localStorage.getItem("cardType") || "Visa",
   creditCardLast4: localStorage.getItem("last4") || "1234",
   creditCardExpDate: localStorage.getItem("expDate") || "12/25",
-  quantityAdults: parseInt(item.numAdults) || 0,
-  quantityChildren: parseInt(item.numChildren) || 0,
+  quantityAdults: Number(item.numAdults) || 0,
+  quantityChildren: Number(item.numChildren) || 0,
   customerBillingName: localStorage.getItem("cardholdername") || "John Doe",
-  totalAmount: parseFloat(localStorage.getItem("CartTotalPrice") || "0"),
+  totalAmount: Number(localStorage.getItem("CartTotalPrice") || "0"),
   transactionId,
   parkId: item.park?.parkId || 0,
   parkName: item.park?.parkName || "Unknown Park",
@@ -232,20 +234,23 @@ export const createBooking = async (
   reservationstatus: "Audit",
   reversetransactionid: "",
   cancellationrefund: 0,
-  cartDetailsJson: JSON.stringify(item),
+  cartDetailsJson: JSON.stringify(cartItems),   // backend expects a string
   totalcartitems: cartItems.length,
   reference: reservationId,
   subReference: cartId.toString(),
-  adults: parseInt(item.numAdults) || 0,
-  children: parseInt(item.numKids) || 0,
+  adults: Number(item.numAdults) || 0,
+  children: Number(item.numChildren) || 0,
   resStart: item.resStartDate || resStart,
   resEnd: item.resEndDate || resEnd,
   tentsites: item.tentsites || 0,
-  parkGuid: item.park?.id || "",
+  parkGuid: item.park?.id || "",   // backend expects a string
   numDays: item.numDays || 1,
   possource: "CAPGEMNI_RIDEFINDER",
-  emailnoticeaddress: localStorage.getItem("email")
+  userid: Number(localStorage.getItem("uid")) || 0,
+  emailnoticeaddress: localStorage.getItem("email") || ""
 };
+  
+   console.log("BookingPayload",bookingPayload);
    
   let numAdults = parseInt(item.numAdults) || 0;
   let numChildren = parseInt(item.numKids) || 0;
