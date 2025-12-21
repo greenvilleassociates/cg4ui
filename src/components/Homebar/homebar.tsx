@@ -74,12 +74,12 @@ export default function Homebar({ numItems }: HomebarProps) {
             fontWeight: 700,
             color: "#CC5500",
             textDecoration: 'none',
-            fontSize: '.50rem',
+            fontSize: '.40rem',
             cursor: 'pointer',
           }}
           className="titleText"
         >
-          [RFV15.8]
+          V15.9
         </Typography>
 
         {/* Spacer pushes rest to right */}

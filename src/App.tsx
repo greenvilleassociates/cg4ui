@@ -11,7 +11,7 @@ import Homebar from './components/Homebar/homebar';
 import Footer from './components/Footer/footer';
 import Welcome from './pages/Welcome';
 import Login from './pages/BasicLogin';
-import Register from './pages/Register';
+import Register from './pages/BasicRegister';
 import Details2 from './pages/Details2';
 import AllReviews from './pages/AllReviews';
 import Logout from './pages/BasicLogout';

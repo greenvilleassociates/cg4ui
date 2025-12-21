@@ -92,7 +92,7 @@ export default function RegisterPage() {
     };
 
     try {
-      const response = await fetch("https://parksapi.547bikes.info/api/User", {
+      const response = await fetch("https://parksapi.547bikes.info/api/User/userfull", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userPayload),
