@@ -228,7 +228,7 @@ export const createBooking = async (
   parkName: item.park?.parkName || "Unknown Park",
   cartid: cartId.toString(),
   reservationtype: "Biking",
-  reservationstatus: "Active",
+  reservationstatus: "Audit",
   reversetransactionid: "",
   cancellationrefund: 0,
   cartDetailsJson: JSON.stringify(item),
@@ -242,7 +242,8 @@ export const createBooking = async (
   tentsites: item.tentsites || 0,
   parkGuid: item.park?.id || "",
   numDays: item.numDays || 1,
-  possource: "CAPGEMNI_RIDEFINDER",   // ? corrected
+  possource: "CAPGEMNI_RIDEFINDER",
+  emailnoticeaddress: localStorage.getItem("email")
 };
    
   let numAdults = parseInt(item.numAdults) || 0;
