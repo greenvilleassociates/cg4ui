@@ -1,0 +1,14 @@
+.payment-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.payment-form-row label {
+  width: 150px;        /* adjust to taste */
+  font-weight: 600;
+}
+
+.payment-form-row input {
+  flex: 1;
+}

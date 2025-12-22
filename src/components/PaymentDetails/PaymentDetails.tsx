@@ -1,30 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CartService from "./../../services/cartService";
 import { createBooking } from "./../../services/bookingService";
 import { useNavigate } from "react-router-dom";
+import "./PaymentDetails.css"; // <-- You will create this small CSS file
 
 export default function PaymentDetails() {
   const [cardNumber, setCardNumber] = useState("");
   const [expDate, setExpDate] = useState("");
   const [cardType, setCardType] = useState("");
   const [name, setName] = useState("");
-  const [amount, setAmount] = useState(100); // Example amount, replace with real cart total
+  const [savedCards, setSavedCards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(false);
+
   const navigate = useNavigate();
   const cartService = new CartService();
 
-  const PostCart = async () => {
+  const uid = localStorage.getItem("uid") || "1";
+
+  // -------------------------------
+  // FETCH SAVED CARDS FROM API
+  // -------------------------------
+  const fetchSavedCards = async () => {
     try {
-      const result = await cartService.finalizeBooking();
-      alert("Cart finalized and booking posted!");
-      console.log("Booking result:", result);
+      const response = await fetch(
+        `https://parksapi.547bikes.info/api/Card?uid=${uid}`
+      );
+      const cards = await response.json();
+      setSavedCards(cards);
     } catch (err) {
-      console.error("Error finalizing booking:", err);
-      alert("Failed to finalize booking.");
+      console.error("Error fetching saved cards:", err);
     }
   };
 
+  useEffect(() => {
+    fetchSavedCards();
+  }, []);
+
+  // -------------------------------
+  // AUTOFILL FORM WHEN CARD SELECTED
+  // -------------------------------
+  const autofillCard = (card) => {
+    setCardType(card.cardType || "");
+    setCardNumber("**** **** **** " + card.cardLast4);
+    setExpDate(card.cardExpDate || "");
+    setName(card.fullname || "");
+  };
+
+  // -------------------------------
+  // GENERATE TRANSACTION ID
+  // -------------------------------
   const generateTransactionId = () => {
     const letters = Array.from({ length: 4 }, () =>
       String.fromCharCode(65 + Math.floor(Math.random() * 26))
@@ -33,10 +58,15 @@ export default function PaymentDetails() {
     return letters + numbers;
   };
 
+  // -------------------------------
+  // SUBMIT PAYMENT
+  // -------------------------------
   const sendCardDetails = async () => {
     const transactionId = generateTransactionId();
     const last4 = cardNumber.slice(-4);
-    const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
+    const cartTotalPrice = parseFloat(
+      localStorage.getItem("CartTotalPrice") || "0"
+    );
 
     localStorage.setItem("last4", last4);
     localStorage.setItem("expDate", expDate);
@@ -45,7 +75,7 @@ export default function PaymentDetails() {
 
     const paymentPayload = {
       paymentId: 0,
-      bookingId: 0, // replace with actual bookingId after Booking POST
+      bookingId: 0,
       paymentMethod: "CreditCard",
       cardType: cardType || "Visa",
       cardLast4: last4,
@@ -53,142 +83,173 @@ export default function PaymentDetails() {
       amountPaid: cartTotalPrice,
       paymentDate: new Date().toISOString(),
       transactionId,
-      useridasstring: localStorage.getItem("uid") || "1",
+      useridasstring: uid,
       transtype: "Sale",
       refundTransactionId: "",
       amountRefunded: 0,
-      fullname: localStorage.getItem("fullname") || "Unknown Cardholder",
-      userid: parseInt(localStorage.getItem("uid")) || 1,
+      fullname: name,
+      userid: parseInt(uid),
       possource: "CAPGEMNI_RIDEFINDER",
     };
 
     console.log("paymentPayload", paymentPayload);
 
-    // BEFORE SENDING PAYLOAD CHECK THE CAPACITY OF THE SITE
-    const currentcart = JSON.parse(localStorage.getItem("rideFinderExampleApp"));
+    // CAPACITY CHECK
+    const currentcart = JSON.parse(
+      localStorage.getItem("rideFinderExampleApp")
+    );
     const firstpark = currentcart[0]?.park?.id;
 
- 	// Call the new API endpoint
-	const response = await fetch(`https://parksapi.547bikes.info/api/ParkInventory/currentusersbyguid?ParkGuid=${firstpark}`);
-	const text = await response.text();   // API returns a string, not JSON
+    const response = await fetch(
+      `https://parksapi.547bikes.info/api/ParkInventory/currentusersbyguid?ParkGuid=${firstpark}`
+    );
+    const text = await response.text();
+    const [maxvisitors, currentvisitors] = text.split(" / ").map(Number);
 
-	// Split the "max / current" string into two numbers
-	const [maxvisitors, currentvisitors] = text.split(" / ").map(Number);
+    const firstparkadultsandchildren =
+      (currentcart[0]?.numAdults || 0) + (currentcart[0]?.numKids || 0);
 
-
-
-    console.log("Max visitors:", maxvisitors);
-    console.log("Current visitors:", currentvisitors);
-
-   const firstparkadultsandchildren =
-  (currentcart[0]?.numAdults || 0) + (currentcart[0]?.numKids || 0);
-
-
-    let checkresult = 1;
-
-    if (maxvisitors >= currentvisitors + firstparkadultsandchildren) {
-      alert("Capacity available");
-      checkresult = 1;
-    } else {
-      alert("Not enough capacity");
-      checkresult = 0;
+    if (maxvisitors < currentvisitors + firstparkadultsandchildren) {
+      alert("Not Enough Capacity at this park during this time!");
+      return;
     }
 
-    if (checkresult) {
-      try {
-        const response = await fetch("https://parksapi.547bikes.info/api/Payments", {
+    try {
+      const response = await fetch(
+        "https://parksapi.547bikes.info/api/Payments",
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(paymentPayload),
-        });
-
-        if (response.ok) {
-          console.log("Payment posted successfully!");
-          alert(
-            `Transaction Successful!\nTransaction ID: ${transactionId}/${cartTotalPrice}`
-          );
-
-          // Call booking service
-          await createBooking(transactionId, navigate, setLoading, setCompleted);
-
-          // Clear cart
-          await cartService.clearCart();
-          localStorage.removeItem("rideFinderExampleApp");
-
-          // Delay navigation so user sees spinner/message
-          setTimeout(() => {
-            navigate("/home");
-          }, 2000);
-
-          // Reset fields
-          setCardNumber("");
-          setExpDate("");
-          setName("");
-          setCardType("");
-        } else {
-          console.error("Payment failed.");
-          alert("Payment failed.");
         }
-      } catch (error) {
-        console.error("Error posting payment:", error);
-        alert("Error posting payment.");
+      );
+
+      if (response.ok) {
+        alert(
+          `Transaction Successful!\nTransaction ID: ${transactionId}/${cartTotalPrice}`
+        );
+
+        await createBooking(transactionId, navigate, setLoading, setCompleted);
+
+        await cartService.clearCart();
+        localStorage.removeItem("rideFinderExampleApp");
+
+        setTimeout(() => navigate("/home"), 2000);
+
+        setCardNumber("");
+        setExpDate("");
+        setName("");
+        setCardType("");
+      } else {
+        alert("Payment failed.");
       }
-    } else {
-      console.error("Capacity insufficient");
-      alert("Not Enough Capacity at this park during this time!");
+    } catch (error) {
+      console.error("Error posting payment:", error);
+      alert("Error posting payment.");
     }
   };
 
+  // -------------------------------
+  // RENDER UI
+  // -------------------------------
   return (
-    <div>
-      <div>
-        <label>Card Number</label>
-        <input
-          type="text"
-          onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ""))}
-          value={cardNumber}
-        />
-      </div>
-      <div>
-        <label>Card Type</label>
-        <input
-          type="text"
-          onChange={(e) => setCardType(e.target.value)}
-          value={cardType}
-        />
-      </div>
-      <div>
-        <label>Expiration Date</label>
-        <input
-          type="text"
-          onChange={(e) => setExpDate(e.target.value)}
-          value={expDate}
-        />
-      </div>
-      <div>
-        <label>Name on Card</label>
-        <input
-          type="text"
-          onChange={(e) => setName(e.target.value)}
-          value={name}
-        />
-      </div>
+    <div
+      style={{
+        display: "flex",
+        gap: "30px",
+        padding: "20px",
+        alignItems: "flex-start",
+      }}
+    >
+      {/* LEFT COLUMN — PAYMENT FORM */}
+      <div style={{ flex: 1 }}>
+        <h2>Payment Details</h2>
 
-      <button onClick={sendCardDetails}>Submit Payment</button>
-
-      {loading && !completed && (
-        <div>
-          <p>Processing your booking...</p>
-          <div className="spinner"></div>
+        <div className="payment-form-row">
+          <label>Card Number</label>
+          <input
+            type="text"
+            value={cardNumber}
+            onChange={(e) =>
+              setCardNumber(e.target.value.replace(/\D/g, ""))
+            }
+          />
         </div>
-      )}
 
-      {completed && (
-        <div>
-          <p>✅ Process complete, returning to the home screen...</p>
-          <div className="spinner"></div>
+        <div className="payment-form-row">
+          <label>Card Type</label>
+          <input
+            type="text"
+            value={cardType}
+            onChange={(e) => setCardType(e.target.value)}
+          />
         </div>
-      )}
+
+        <div className="payment-form-row">
+          <label>Expiration Date</label>
+          <input
+            type="text"
+            value={expDate}
+            onChange={(e) => setExpDate(e.target.value)}
+          />
+        </div>
+
+        <div className="payment-form-row">
+          <label>Name on Card</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <button className="btn btn-primary mt-3" onClick={sendCardDetails}>
+          Submit Payment
+        </button>
+
+        {loading && !completed && (
+          <div>
+            <p>Processing your booking...</p>
+            <div className="spinner"></div>
+          </div>
+        )}
+
+        {completed && (
+          <div>
+            <p>Process complete, returning to the home screen...</p>
+            <div className="spinner"></div>
+          </div>
+        )}
+      </div>
+
+      {/* RIGHT COLUMN — SAVED CARDS */}
+      <div style={{ flex: 1 }}>
+        <h2>Saved Cards</h2>
+
+        {savedCards.length === 0 && <p>No saved cards found.</p>}
+
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {savedCards.map((card) => (
+            <li
+              key={card.cardId}
+              style={{
+                border: "1px solid #ccc",
+                padding: "12px",
+                marginBottom: "10px",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+              onClick={() => autofillCard(card)}
+            >
+              <strong>{card.cardType}</strong> — {card.cardVendor}
+              <br />
+              Ending in <strong>{card.cardLast4}</strong>
+              <br />
+              Expires: {card.cardExpDate}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
