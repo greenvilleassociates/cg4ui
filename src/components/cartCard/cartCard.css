@@ -7,10 +7,12 @@ max-height: 250px;
 .card-body {
     border: 1px solid black;
     border-radius: 1em;
-    width: 55%;
+    width: 40%;
     box-shadow: 1px 1px 6px;
     columns: 2;
     position: relative;
+	margin: 0 auto;
+	font-size: 9pt;
 }
 
 .card-image {
@@ -77,3 +79,50 @@ max-height: 250px;
 .hidden {
     visibility: hidden;
 }
+
+/* ------------------------------
+   PARK DETAILS (centered, full width, 11pt)
+------------------------------ */
+.park-details {
+    width: 100%;
+    text-align: center;
+    font-size: 11pt;
+    margin: 1em 0;
+}
+
+.park-details .card-title {
+    font-size: 13pt;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.park-details .card-subtitle {
+    font-size: 11pt;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.park-details div {
+    margin: 4px 0;
+}
+
+.qty-input { width: 10ch; /* 10 characters wide */ text-align: center; }
+.qty-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* centers everything */
+    margin: 4px 0;
+}
+
+.qty-row label {
+    width: 85px;   /* fixed width so inputs align */
+    text-align: right;
+    margin-right: 8px;
+}
+
+.qty-input {
+    width: 10ch;
+    text-align: center;
+}
+

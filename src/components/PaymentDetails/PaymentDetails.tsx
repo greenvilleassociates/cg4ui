@@ -2,16 +2,28 @@ import { useEffect, useState } from "react";
 import CartService from "./../../services/cartService";
 import { createBooking } from "./../../services/bookingService";
 import { useNavigate } from "react-router-dom";
-import "./PaymentDetails.css"; // <-- You will create this small CSS file
+import "./PaymentDetails.css";
 
 export default function PaymentDetails() {
   const [cardNumber, setCardNumber] = useState("");
   const [expDate, setExpDate] = useState("");
   const [cardType, setCardType] = useState("");
   const [name, setName] = useState("");
+  const [cvv, setCvv] = useState("");
+
   const [savedCards, setSavedCards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(false);
+
+  // Modal state
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
+
+  // New card modal fields
+  const [newCardNumber, setNewCardNumber] = useState("");
+  const [newCardType, setNewCardType] = useState("");
+  const [newExpDate, setNewExpDate] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newCvv, setNewCvv] = useState("");
 
   const navigate = useNavigate();
   const cartService = new CartService();
@@ -19,7 +31,7 @@ export default function PaymentDetails() {
   const uid = localStorage.getItem("uid") || "1";
 
   // -------------------------------
-  // FETCH SAVED CARDS FROM API
+  // FETCH SAVED CARDS
   // -------------------------------
   const fetchSavedCards = async () => {
     try {
@@ -38,13 +50,14 @@ export default function PaymentDetails() {
   }, []);
 
   // -------------------------------
-  // AUTOFILL FORM WHEN CARD SELECTED
+  // AUTOFILL FORM
   // -------------------------------
   const autofillCard = (card) => {
     setCardType(card.cardType || "");
     setCardNumber("**** **** **** " + card.cardLast4);
     setExpDate(card.cardExpDate || "");
     setName(card.fullname || "");
+    setCvv("");
   };
 
   // -------------------------------
@@ -56,6 +69,80 @@ export default function PaymentDetails() {
     ).join("");
     const numbers = Math.floor(100000 + Math.random() * 900000).toString();
     return letters + numbers;
+  };
+
+  // -------------------------------
+  // SAVE NEW CARD (WITH VALIDATION) //THE VALIDATOR ONLY CHECKS THE CARD NUMBER AND RETURNS IS GOOD AND TYPE.
+  // -------------------------------
+  const saveNewCard = async () => {
+    const validationPayload = {
+      cardNumber: newCardNumber,   
+      cardFullname: "",
+      expDate: "",
+      securityCode: "",
+    };
+
+    try {
+      // Validate card first
+      const validateResponse = await fetch(
+        "https://parksapi.547bikes.info/api/Card/Validate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(validationPayload),
+        }
+      );
+
+      const validateResult = await validateResponse.json();
+
+      if (!validateResponse.ok || validateResult?.isValid === false) {
+        alert(
+          validateResult?.message ||
+            "Card validation failed. Please check the card details."
+        );
+        return;
+      }
+
+      // Save card after validation passes
+      const payload = {
+        cardId: 0,
+        userid: parseInt(uid),
+        useridasstring: uid,
+        cardType: newCardType,
+        cardLast4: newCardNumber.slice(-4),
+        cardExpDate: newExpDate,
+        fullname: newName,
+        cardVendor: "Unknown",
+        cvv: newCvv,
+      };
+
+      const response = await fetch(
+        "https://parksapi.547bikes.info/api/Card",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        alert("Card saved!");
+
+        fetchSavedCards();
+        setShowAddCardModal(false);
+
+        setNewCardNumber("");
+        setNewCardType("");
+        setNewExpDate("");
+        setNewName("");
+        setNewCvv("");
+      } else {
+        alert("Failed to save card.");
+      }
+    } catch (err) {
+      console.error("Error saving card:", err);
+      alert("Error saving card.");
+    }
   };
 
   // -------------------------------
@@ -72,6 +159,7 @@ export default function PaymentDetails() {
     localStorage.setItem("expDate", expDate);
     localStorage.setItem("cardholdername", name);
     localStorage.setItem("cardType", cardType);
+    localStorage.setItem("cvv", cvv);
 
     const paymentPayload = {
       paymentId: 0,
@@ -90,6 +178,7 @@ export default function PaymentDetails() {
       fullname: name,
       userid: parseInt(uid),
       possource: "CAPGEMNI_RIDEFINDER",
+      cvv: cvv,
     };
 
     console.log("paymentPayload", paymentPayload);
@@ -140,6 +229,7 @@ export default function PaymentDetails() {
         setExpDate("");
         setName("");
         setCardType("");
+        setCvv("");
       } else {
         alert("Payment failed.");
       }
@@ -153,14 +243,7 @@ export default function PaymentDetails() {
   // RENDER UI
   // -------------------------------
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "30px",
-        padding: "20px",
-        alignItems: "flex-start",
-      }}
-    >
+    <div className="payment-container">
       {/* LEFT COLUMN — PAYMENT FORM */}
       <div style={{ flex: 1 }}>
         <h2>Payment Details</h2>
@@ -203,6 +286,18 @@ export default function PaymentDetails() {
           />
         </div>
 
+        <div className="payment-form-row">
+          <label>Security Code</label>
+          <input
+            type="text"
+            maxLength={3}
+            value={cvv}
+            onChange={(e) =>
+              setCvv(e.target.value.replace(/\D/g, ""))
+            }
+          />
+        </div>
+
         <button className="btn btn-primary mt-3" onClick={sendCardDetails}>
           Submit Payment
         </button>
@@ -225,6 +320,7 @@ export default function PaymentDetails() {
       {/* RIGHT COLUMN — SAVED CARDS */}
       <div style={{ flex: 1 }}>
         <h2>Saved Cards</h2>
+
 
         {savedCards.length === 0 && <p>No saved cards found.</p>}
 
@@ -249,7 +345,87 @@ export default function PaymentDetails() {
             </li>
           ))}
         </ul>
+              <button
+          className="btn btn-secondary"
+          style={{ marginBottom: "15px" }}
+          onClick={() => setShowAddCardModal(true)}
+        >
+          + Add New Card
+        </button>
       </div>
+
+      {/* -------------------------------
+          ADD NEW CARD MODAL
+      -------------------------------- */}
+      {showAddCardModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add New Card</h3>
+
+            <div className="payment-form-row">
+              <label>Card Number</label>
+              <input
+                type="text"
+                value={newCardNumber}
+                onChange={(e) =>
+                  setNewCardNumber(e.target.value.replace(/\D/g, ""))
+                }
+              />
+            </div>
+
+            <div className="payment-form-row">
+              <label>Card Type</label>
+              <input
+                type="text"
+                value={newCardType}
+                onChange={(e) => setNewCardType(e.target.value)}
+              />
+            </div>
+
+            <div className="payment-form-row">
+              <label>Expiration Date</label>
+              <input
+                type="text"
+                value={newExpDate}
+                onChange={(e) => setNewExpDate(e.target.value)}
+              />
+            </div>
+
+            <div className="payment-form-row">
+              <label>Name on Card</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+            </div>
+
+            <div className="payment-form-row">
+              <label>Security Code</label>
+              <input
+                type="text"
+                maxLength={3}
+                value={newCvv}
+                onChange={(e) =>
+                  setNewCvv(e.target.value.replace(/\D/g, ""))
+                }
+              />
+            </div>
+
+            <button className="btn btn-primary" onClick={saveNewCard}>
+              Save Card
+            </button>
+
+            <button
+              className="btn btn-light"
+              style={{ marginLeft: "10px" }}
+              onClick={() => setShowAddCardModal(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
