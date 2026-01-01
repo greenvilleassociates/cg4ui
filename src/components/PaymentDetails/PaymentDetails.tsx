@@ -74,76 +74,87 @@ export default function PaymentDetails() {
   // -------------------------------
   // SAVE NEW CARD (WITH VALIDATION) //THE VALIDATOR ONLY CHECKS THE CARD NUMBER AND RETURNS IS GOOD AND TYPE.
   // -------------------------------
-  const saveNewCard = async () => {
-    const validationPayload = {
-      cardNumber: newCardNumber,   
-      cardFullname: "",
-      expDate: "",
-      securityCode: "",
-    };
+ const saveNewCard = async () => {
+  const validationPayload = { cardNumber: newCardNumber, cardFullname: newName || "", expDate: newExpDate || "", securityCode: newCvv || "" };
+  try {
+    console.log("validationPayload:", validationPayload);
 
-    try {
-      // Validate card first
-      const validateResponse = await fetch(
-        "https://parksapi.547bikes.info/api/Card/Validate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(validationPayload),
-        }
-      );
-
-      const validateResult = await validateResponse.json();
-
-      if (!validateResponse.ok || validateResult?.isValid === false) {
-        alert(
-          validateResult?.message ||
-            "Card validation failed. Please check the card details."
-        );
-        return;
+    // Validate card first
+    const validateResponse = await fetch(
+      "https://parksapi.547bikes.info/api/Card/Validate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validationPayload),
       }
+    );
 
-      // Save card after validation passes
-      const payload = {
-        cardId: 0,
-        userid: parseInt(uid),
-        useridasstring: uid,
-        cardType: newCardType,
-        cardLast4: newCardNumber.slice(-4),
-        cardExpDate: newExpDate,
-        fullname: newName,
-        cardVendor: "Unknown",
-        cvv: newCvv,
-      };
-
-      const response = await fetch(
-        "https://parksapi.547bikes.info/api/Card",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (response.ok) {
-        alert("Card saved!");
-
-        fetchSavedCards();
-        setShowAddCardModal(false);
-
-        setNewCardNumber("");
-        setNewCardType("");
-        setNewExpDate("");
-        setNewName("");
-        setNewCvv("");
-      } else {
-        alert("Failed to save card.");
-      }
-    } catch (err) {
-      console.error("Error saving card:", err);
-      alert("Error saving card.");
+    // Protect against HTML error pages (IIS 500, etc.)
+    const contentType = validateResponse.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await validateResponse.text();
+      console.error("Non‑JSON response from API:", text);
+      alert("Unexpected server response. Please try again.");
+      return;
     }
-  };
+
+    const validateResult = await validateResponse.json();
+    console.log("validateResult:", validateResult);
+
+    if (!validateResponse.ok || validateResult?.isValid === false) {
+      alert(
+        validateResult?.message ||
+          "Card validation failed. Please check the card details."
+      );
+      return;
+    }
+
+    // Save card after validation passes
+   const payload = {
+  cardId: 0,
+  uid: uid.toString(),                 // API expects string
+  cardType: newCardType || "Unknown",
+  cardVendor: "Unknown",               // or whatever you want
+  cardLast4: newCardNumber.slice(-4),
+  cardExpDate: newExpDate || "",
+  billingZip: newBillingZip || "",     // you need to add this input
+  isActive: 1,
+  cardbtn: "AddCard",                  // or whatever your API expects
+  fullname: newName,
+  fullcardnumber: newCardNumber,       // API requires full number
+  userid: parseInt(uid)                // API expects number
+};
+
+
+    const response = await fetch(
+      "https://parksapi.547bikes.info/api/Card",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      alert("Card saved!");
+
+      fetchSavedCards();
+      setShowAddCardModal(false);
+
+      setNewCardNumber("");
+      setNewCardType("");
+      setNewExpDate("");
+      setNewName("");
+      setNewCvv("");
+    } else {
+      alert("Failed to save card.");
+    }
+  } catch (err) {
+    console.error("Error saving card:", err);
+    alert("Error saving card.");
+  }
+};
+
 
   // -------------------------------
   // SUBMIT PAYMENT
