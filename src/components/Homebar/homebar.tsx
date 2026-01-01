@@ -79,7 +79,7 @@ export default function Homebar({ numItems }: HomebarProps) {
           }}
           className="titleText"
         >
-          [RF.V16.01]
+          [RF.V17.01]
         </Typography>
 
         {/* Spacer pushes rest to right */}

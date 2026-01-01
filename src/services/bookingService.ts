@@ -90,40 +90,57 @@ export const postCartToCGCart = async (transactionId: string) => {
 
   // 🔑 Transform cart items into the schema the backend expects
   const items = cartItems.map((item) => {
-    const numAdults = parseInt(item.numAdults) || 0;
-    const numChildren = parseInt(item.numKids) || 0;
-    const numDays = item.numDays || 1;
+  const numAdults = parseInt(item.numAdults) || 0;
+  const numChildren = parseInt(item.numChildren ?? item.numKids) || 0;
+  const numDays = item.numDays || 1;
 
-    const resStart = new Date();
-    const resEnd = new Date(
-      resStart.getTime() + (numDays > 1 ? (numDays - 1) * 24 * 60 * 60 * 1000 : 0)
-    );
+  const start = item.resStartDate
+    ? new Date(item.resStartDate)
+    : new Date();
 
-    return {
-      park: item.park,
-      numAdults,
-      numChildren,
-      numDays,
-      resStart: item.resStartDate || resEnd, //If the Item is populated properly... it can be any date....
-      resEnd: item.resEndDate || resStart,   //If its not populated it takes the current date and adds the num days.
-      totalPrice: (numAdults * (item.park?.adultPrice || 0)) +
-                  (numChildren * (item.park?.childPrice || 0)),
-    };
-  });
+  const end = item.resEndDate
+    ? new Date(item.resEndDate)
+    : new Date(start.getTime() + (numDays - 1) * 86400000);
+
+  return {
+    park: {
+      id: item.park?.id,
+      parkName: item.park?.parkName,
+      location: item.park?.location,
+      description: item.park?.description,
+      adultPrice: item.park?.adultPrice || 0,
+      childPrice: item.park?.childPrice || 0,
+      imageUrl: item.park?.imageUrl,
+      reviews: item.park?.reviews || []
+    },
+    numAdults,
+    numChildren,               // ? FIXED
+    numDays,
+    resStart: start.toISOString(), // ? FIXED
+    resEnd: end.toISOString(),     // ? FIXED
+    totalPrice:
+      numAdults * (item.park?.adultPrice || 0) +
+      numChildren * (item.park?.childPrice || 0)
+  };
+});
+
 
   // ✅ Instead of recalculating, pull CartTotalPrice from localStorage
   const cartTotalPrice = parseFloat(localStorage.getItem("CartTotalPrice") || "0");
  const parkId = cartItems[0]?.park?.parkId;
 
-  const CGpayload = {
-    userId: parseInt(localStorage.getItem("userid") || "0"),
-    uid: localStorage.getItem("uid") || "guest",
-    transactionTotal: cartTotalPrice, // use stored CartTotalPrice
-    paymentId: transactionId,
-    items,
-    useremail: localStorage.getItem("email"),
-  	parkId: parkId
-  };
+const CGpayload = {
+  userId: parseInt(localStorage.getItem("userid") || "0"),
+  uid: localStorage.getItem("uid") || "guest",
+  transactionTotal: cartTotalPrice,
+  paymentId: transactionId,
+  resStart: items[0].resStart,   // ? FIXED
+  resEnd: items[0].resEnd,       // ? FIXED
+  items,
+  useremail: localStorage.getItem("email") || "",
+  parkId: parkId
+};
+
   
   console.log("CGARTPOST", JSON.stringify(CGpayload));
   localStorage.setItem("CGCARTPOST",JSON.stringify(CGpayload));
@@ -240,8 +257,8 @@ export const createBooking = async (
   subReference: cartId.toString(),
   adults: Number(item.numAdults) || 0,
   children: Number(item.numChildren) || 0,
-  resStart: item.resStartDate || resStart,
-  resEnd: item.resEndDate || resEnd,
+  resStart: (item.resStartDate ? new Date(item.resStartDate) : resStart).toISOString() || "", 
+  resEnd: (item.resEndDate ? new Date(item.resEndDate) : resEnd).toISOString() || "",
   tentsites: item.tentsites || 0,
   parkGuid: item.park?.id || "",   // backend expects a string
   numDays: item.numDays || 1,
