@@ -28,7 +28,7 @@ import { Dispatch, SetStateAction } from "react";
     const calendarPayload = 
       {
       	parkId: parkId.toString(),        
-        customerId: 33,  
+        customerId: parseInt(localStorage.getItem("uid")) || 900,  
         startDate: someresstart || now,
         endDate: someresend || now,            
         transactionId: sometransactionId,
